@@ -149,19 +149,29 @@ To see whether a vector v (point) is on that line, solve the linear system:
 If there is a solution, then vector v in on that line. Otherwise, it is not.
 
 ## Definition plane
-If the vectors are in R^3 and not R^2, then it is no longer *direction vector* but *spanning vector*. Similar to spanning a line on R^2, you can span a plane on R^3 with two spanning vectors. With support vector u, and spanning vectors v,w:
+If the vectors are in R^3 and not R^2, then it is no longer *direction vector* but *spanning vector*. Similar to spanning a line on R^2, you can span a plane on R^3 with two spanning vectors. With support vector u, and spanning vectors v,w the palne satisfies:
 
-u + rv+ sw, with r,s ∈ R.
+u + rv+ sw, is the *spanning form* of a plane, with r and s ∈ R.
 
 Alternatively, find a *normal vector* n, which is orthogonal to both v and w. A *normal vector* to a plane is a vector that is perpendicular to the plane at any given point. Therefore, a normal vector n is:
 
 n ⋅ v = 0
 n ⋅ w = 0
 
-Then any point p on the plane satisfies:
+Then any point (vector) p on the plane satisfies:
 
-n ⋅ (p − u) = 0
+n ⋅ (p − u) = 0, which is a representation of a plane in *normal form*
 
 ## Going from one plane to the other
+Consider the plane in a normal form (1, 0, 1)t ⋅ (v − (0, 1, 0)) = 0
+
+If you take the normal vector of the plane's normal form, which is (1, 0, 1)t in this case, you can write down the plane's spanning form by finding two vectors orthogonal to the normal vector. The vectors (0, 1, 0)t, (1, 0, −1)t are orthogonal to the normal vector. Thus the spanning form of the plane is:
+
+(0, 1, 0)t + r (0, 1, 0)t + s(1, 0, −1)t 
 
 ## Points on sides of a plane
+For points, v, w, you can see how they are ordered along a line spanned by u by looking at the dot product. Consider the normal form of a plane:
+
+(0, 1, 1)t ⋅ (v − (0, 0, 3)t) = 0
+
+The point (0, 0, 3)t on the plane yields (0, 1, 1)t ⋅ (0, 0, 3)t = 3.
