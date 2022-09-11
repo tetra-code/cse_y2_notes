@@ -91,4 +91,77 @@ Solve the linear system:
 ![image info](../../images/basis_representation.png)
 
 ## Angles betwen vectors
+For two vectors v,w the angle α between them can be computed as v ⋅ w = ∥v∥ * ∥w∥ * cos(α)
 
+α = arccos(( v ⋅ w ) / ∥v∥ * ∥w∥)
+
+The two vectors that enclose an angle of 90 degrees are called *orthogonal*. IF the angle is 90 degrees, then 
+cos(α) = 0 and thus v ⋅ w = 0 as well. If we know that vector v = (2, 3)t, find the other orthoogonal vector 
+w = (w1, w2)t, such that 
+
+v ⋅ w = 2*w1 + 3*w2 = 0 
+
+Thus all vectors of the form w = r*(-3/2, 1)t are orthogonal to vector v.
+
+![image info](../../images/orthogonal.png)
+
+## Orthgonal vector in 3D
+Give two vectors v = (1, 0, 1)t and w = (0, 1, 1)t ∈ R^3, we need a third vector u = (u1, u2, u3)t ∈ R3 that is orthogonal to the first two vectors. Solve the following linear system:
+
+v ⋅ u = u1 + u3 = 0
+w ⋅ u = u2 + u3 = 0
+
+This shows us u1 = u2 = -u3. Therefore all vectors of the form u = r*(1, 1, -1)t is orthogonal to vectors v and w.
+
+## Definition matrix
+In R^3 and R^3, all linear maps can be written as matrices.
+
+If A is an *m x n* matrix, B must be an *n x k* matrix to be able to multiply to A. This means AB is possible but BA is not.
+
+## Matrix inverse
+For a matrix to have the *possibility* of an inverse, it must be a square ( n x n matrix). To check whether the square matrix *has* an inverse check its *determinant*. 
+
+For matrix  A = [a  b] the determinant is *ad - bc*. If the determinant *ad - bc* = 0, then there is no inverse.
+                [c  d]                                  
+If the determinant is not 0, the inverse matrix C of matrix A exists:
+
+C =    1    [d  -b] 
+    ad - bc [-c  a]
+
+There is also the property CA = I, with I being the identity matrix. 
+
+## Definition line
+A line in R^2 can be represented via the linear equation 'y = mx + b' for some scalars m,b ∈ R. It can also be represented as a composition of *support vector* and *direction vector*. For example 'y = -2x + 1' can be represented as:
+
+(0, 1)t + r*(1, -2)t, where (0, 1)t is the support vector (constant) and (1, -2)t is the direction vector (coefficient).
+
+![image info](../../images/linear_line.png)
+
+## Points on a line
+Consider a line represented by support vector s and direction vector d:
+
+(s) + r*(d), with r ∈ R.
+
+To see whether a vector v (point) is on that line, solve the linear system:
+
+(s) + r*(d) = v
+
+If there is a solution, then vector v in on that line. Otherwise, it is not.
+
+## Definition plane
+If the vectors are in R^3 and not R^2, then it is no longer *direction vector* but *spanning vector*. Similar to spanning a line on R^2, you can span a plane on R^3 with two spanning vectors. With support vector u, and spanning vectors v,w:
+
+u + rv+ sw, with r,s ∈ R.
+
+Alternatively, find a *normal vector* n, which is orthogonal to both v and w. A *normal vector* to a plane is a vector that is perpendicular to the plane at any given point. Therefore, a normal vector n is:
+
+n ⋅ v = 0
+n ⋅ w = 0
+
+Then any point p on the plane satisfies:
+
+n ⋅ (p − u) = 0
+
+## Going from one plane to the other
+
+## Points on sides of a plane
