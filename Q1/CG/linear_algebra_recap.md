@@ -22,6 +22,21 @@ The following vector is from domain R^3, where R stands for real number.
 v = ( v2 ) = (v1, v2, v3)^t , where t stands for *transposed*
     ( v3 )
 
+## Vector basic mathematical operands:
+The basic mathematical operands include 
+
+- addition
+- subtraction
+- elemental multiplication
+- elemental division
+
+![image info](../../images/cpp_vector_math_operations.png)
+
+## Vector cross product:
+
+The formula for vector cross product:
+
+![image info](../../images/vector_cross_product.png)
 
 ## Vector length
 For vector v ∈ R^2, v = (v1, v2)^t
