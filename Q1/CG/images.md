@@ -113,3 +113,21 @@ APply projection (non linear scaling)
 This can become complicated. A better way is to unify translation, rotation and projection. But because translations and projections are not linear  we can't use matrixes. Instead use homogenous coordinates from projective geometry. 
 
 A camera projection is a matri and combining matrices allows us to define hierarchical-object dependencies.
+
+## HOmogenous coordinates
+An N-dimensional projective space Pn is represented by N+1 coordinates. No null vectors
+
+Two points p,q are equal iff exists a != 0 s.t p*a = q 
+
+IN a 2D projective space P2,
+(2,2,2) = (3,3,3,) = (4,4,4)
+(3, 3, 3) != (4, 3, 4)
+(0, 1, 0) = (0, 2, 0)
+
+To embed a standard vectors space Rn into an n-D projective space Pn, we can map
+Take Rn add a 1 to its end 
+
+A point (x, y) in R2 embbed in a projective space corresponds to (x, y, 1). All points (x, y, 1) form a plane, called as *affine plane*. ALl these poitns are basically lines, simply scaled with a scalar.
+
+Thus we can go back to R2 by dividing the corodintes by the last entry. (x, y, w) in P2 corresponds to (x/w, y/w) R2. But the poitns where you have zero in the end, has no correspondence to R2. The plane with w=0 is not reachable. THese points with w=0, as you drag w near towards 0, the points go towards infinity. THis is away to decribe poitns at infinit, and they converge to that central point! This isthe key to transform ojcets using projective geometry
+
