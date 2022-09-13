@@ -24,7 +24,7 @@ We don't have a true distriution, only a sampled data set. Thus we have to appro
 <!-- Density estimation - uses non-parametic appraoch. -->
 *Histogram-based density estimation* approximate desnity by the histogram. Not very accurate
 
-![image](../../histogram_desnity_estimate.PNG)
+![image](../../images/histogram_desnity_estimate.PNG)
 
 If for 1-dimensional data, we need about 1000 objects. Lets say this result in 50 parameters (histogram bar)
 For M-dimensional (M features) data, we need 1000^M objects. This results in 50^M parameters. Thus this density is not suitable for M>2 features.
@@ -37,7 +37,7 @@ Curse of dimensionality:
 
 This results in an optimal number of features to use:
 
-![image](../../curse_dimensionality.PNG)
+![image](../../images/curse_dimensionality.PNG)
 
 
 There are several desity estimation appraoches
@@ -61,20 +61,20 @@ N(x|μ, Σ)
 
 The guassian distribution for a 2-dimensional (2 feature) objet data. As shown below, the mean is denoted as vector and the variance is replaced with *covariance matrix*:
 
-![image](../../gaussian_2d.PNG)
+![image](../../images/gaussian_2d.png)
 
 
 If the mean vector changes, the shape is shifted. If the covariance matrix changes, the shape is widener, narrower or rotated.
 
-![image](../../rotated_gaussian_2d.PNG)
+![image](../../images/rotated_gaussian_2d.PNG)
 
 Below, the arrows are the eigen vectors of the covariance matrix:
 
-![image](../../more_gaussian_2d.PNG)
+![image](../../images/more_gaussian_2d.PNG)
 
 On convariance matrix, 
 
-![image](../../covariance_matrix_structure.PNG)
+![image](../../images/covariance_matrix_structure.PNG)
 ## Maximum likelihood
 
 check the formula
