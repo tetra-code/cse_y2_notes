@@ -1,3 +1,5 @@
+# Week 1
+
 # Scala 
 
 ## Basics
@@ -212,4 +214,4 @@ From above: How can we get the list of movie names together with the name of the
 
 *In BDP, we normally create some case class and create tuples from those classes as data. It is easier to read from input data and process.
 
-Join operation also possible in Scala.
+EXplicit Join operation doesn't exist in Scala.
