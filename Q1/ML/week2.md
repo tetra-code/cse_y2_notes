@@ -21,10 +21,8 @@ We don't have a true distriution, only a sampled data set. Thus we have to appro
 - Non-parametric models: don't assume a specific shape of the distrubtion
 
 ## Parametric Modeling & Estimation
-Density estimation - uses non-parametic appraoch.
-
-### Histogram-based density estimation
-Approximate desnity by the histogram. Not very accurate
+<!-- Density estimation - uses non-parametic appraoch. -->
+*Histogram-based density estimation* approximate desnity by the histogram. Not very accurate
 
 [image](../../histogram_desnity_estimate.PNG)
 
@@ -41,5 +39,35 @@ This results in an optimal number of features to use:
 
 [image](../../curse_dimensionality.PNG)
 
-### Density Estimation Approaches
 
+There are several desity estimation appraoches
+
+- parametric: assume simple global model and estimate the parameters
+- non-parametric: assume simple local model, e.g.
+
+*Gaussian Distribution* is equivalent to normal distribution
+
+
+
+
+*Multivariate Gaussians* accounts for p - dimensional density.
+
+
+
+
+The formula above is also denoted as:
+
+N(x|μ, Σ)
+
+The guassian distribution for a 2-dimensional (2 feature) objet data. As shown below, the mean is denoted as vector and the variance is replaced with *covariance matrix*:
+
+[image](../../guassian_2d.PNG)
+
+
+If the mean vector changes, the shape is shifted. If the covariance matrix changes, the shape is widener, narrower or rotated.
+
+[image](../../rotated_gaussian_2d.PNG)
+
+Below, the arrows are the eigen vectors of the covariance matrix:
+
+[image](../../more_gaussian_2d.PNG)
