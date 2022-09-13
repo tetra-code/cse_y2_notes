@@ -67,21 +67,21 @@ For each object in the feature space, we should estimate the p(w|x), which is  p
 ## Create decision boundary
 Lets use an example. Suppose we have the following gaussian data for some feature 1 and we want to estimate p(w|x), which is the probability that feature 1 is blue. Of course the sum of the probability of feature 1 being every possible class is 1.
 
-[image](../../gaussian_data_graph.PNG)
+![image](../../gaussian_data_graph.PNG)
 
 Based on the data shown in the graph above, assgin the label of the class that has the largest posterior probability. So if p(w1|x) > p(w2|x), we assign the feature x with w1. If p(w1|x) < p(w2|x), assign the feature x with w2. Else, we draw a *decision boundary*. *Note that we are assuming that there are only two possible classes.
 
-[image](../../graph_posterior_probability.PNG)
+![image](../../graph_posterior_probability.PNG)
 
 In many cases the posterior probability is hard to estimate, thus we use the *Bayes theorem* to rewrite it into another form:
 
-[image](../../bayes_theorem.PNG)
+![image](../../bayes_theorem.PNG)
 
 *class conditional probability* is the probability of a particular feature value x, given the feature is in category wi
 
 *class prior* is the probability of a class wi happening
 
-[image](../../conditional_probability.PNG)
+![image](../../conditional_probability.PNG)
  
 To be able to classify a feature space, we need the posterior probability. According to *Bayes rule*, that is possible wiith the *Bayes theorem*:
 1. Estimate the class conditional probability
@@ -92,13 +92,13 @@ To be able to classify a feature space, we need the posterior probability. Accor
 
 Depending on the class-conditional-probability densities or distribution, complicated decision boundaries can appear: 
 
-[image](../../complicated_decision_boundary.PNG)
+![image](../../complicated_decision_boundary.PNG)
 
-[image](../../multi_modal_distribution.PNG)
+![image](../../multi_modal_distribution.PNG)
 
 If the class is too dispersed or the class prior is low (low probability of occuring) can be too small (class prior is low), no objects can be assigned to that class.
 
-[image](../../absent_decision_boundary.PNG)
+![image](../../absent_decision_boundary.PNG)
 
 To obtain class conditional probabilities p(x|wi), we need to assume a model beforehand. Estimate the model parameters s.t the example objects fit will. This is where *maximum likelihood estimators* are useful.
 
