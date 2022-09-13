@@ -107,3 +107,8 @@ if you have n-dimesnional data set in a gaussian distribution, you need at least
 You can take combination of separate gaussian distributions. This erquires giving each separate gaussian a weight. 
 
 FOr now ignore mixture models
+
+question: why only consider multivariate gaussian
+
+With increasing dimensions / # measurements, does
+Gaussian or histogram need more data? -> histogram
