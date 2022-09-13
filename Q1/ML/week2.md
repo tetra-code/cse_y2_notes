@@ -71,3 +71,39 @@ If the mean vector changes, the shape is shifted. If the covariance matrix chang
 Below, the arrows are the eigen vectors of the covariance matrix:
 
 [image](../../more_gaussian_2d.PNG)
+
+On convariance matrix, 
+
+[image](../../covariance_matrix_structure.PNG)
+## Maximum likelihood
+
+check the formula
+
+## Quiz
+Mean of class +1: if you look at the pic, the values that have class +1 are
+2  0
+3  0
+
+2+3 = 5/2 =2.5. THus mean for feature 1 is 2.5.
+0+0 = 0/2 = 0.  Thus mean for feature 2 is 0.
+
+THe covariance of class +1 is a 2 by 2 matrix. The spread of feature 2 is 0. And the spread of feature 2 is 
+
+
+
+....
+...
+
+##
+From above, if you can't get the inverse of the covariance matrix, it might mean you need for objects. Or some feature is redundant and can be removed.
+
+if you have n-dimesnional data set in a gaussian distribution, you need at least n elements for the mean vector and 0.5 * n * (n+1)
+
+
+
+ ## Parametric estimation
+
+## MIxture models
+You can take combination of separate gaussian distributions. This erquires giving each separate gaussian a weight. 
+
+FOr now ignore mixture models
