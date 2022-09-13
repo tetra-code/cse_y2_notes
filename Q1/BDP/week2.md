@@ -71,5 +71,125 @@ Useful higher-order functions include Map, filter, fold and friends as they pack
 
 not loops with mutable iterator variables (like for-loop or while-loop). higher-order functions come in. Map, filter, fold and friends package up common recursive patterns into library functions that are easier to use than direct recursion and signal intent. 
 
-### Defining objects
+### OO to FP
+** come back to this again when reviewing
+The below is flawed for FP as it has side effects and the function is not testable.
 
+```
+    class Cafe {
+        def buyCoffee(cc: CreditCard): Coffee = {
+            val cup = new Coffee()
+            cc.charge(cup.price)
+            cup
+        }
+    }
+```
+
+Solutions is to separate and break the eternal dependencies.
+
+```
+    class Cafe {
+        def buyCoffee(cc: CreditCard, p: Payments): Coffee = {
+            val cup = new Coffee()
+            p.charge(cc, cup.price)
+            cup
+        }
+    }
+```
+
+THe for loop the 
+
+## Immutable data structures
+Scala has both mutable and immutable versions of many common data structures. If in doubt, use immutable.
+
+```
+  val oneTwoThree = List(1, 2, 3)
+  val oneTwoThree_2 = 1 :: 2 :: 3 :: Nil  // same as the above
+  val one = oneTwoThree.head
+  val twoThree = oneTwoThree.tail
+```
+
+*Nil* is a list which has zero elements in it.
+
+The ::() operator in is utilized to add an element to the beginning of the list. 
+
+The '1 :: 2 :: 3 :: Nil' expression is the same as List(1, 2, 3).
+The 'b :: a :: Nil' expression is same as List(b, a) 
+
+In scala list, *list.head* points to the first element of the list but *list.tail* does NOT point to the last element of the list:
+
+```
+    val oneItem = List(1)
+    oneItem.head                    // 1
+    oneItem.tail                    // Nil (empty list)
+
+    val mulItem = List(1, 2, 3, 4)
+    mulItem.head                    // 1
+    mulItem.tail is List(2, 3, 4)   // List(2, 3, 4)
+
+    b::a::Nil 
+```
+
+*Pattern matching* checks a value against a pattern. If the match is successful, it can deconstruct a value into its consitituent parts. Below a list is deconstructed into a head (giving it the name x) and a tail/rest (giving it the name xs). Those two parts can now be accessed separately in the expression after the arrow.
+
+```
+    def length(ints: List[Int]): Int = ints match {
+        case Nil => 0
+        case x :: xs => 1 + length(xs)     // x, xs are declared
+    }
+```
+
+Another example of pattern matching:
+```
+    val x = List(1,2,3,4,5) match {
+        case x :: 2 :: 4 :: xs => x
+        case Nil => 42
+        case x :: y :: 3 :: 4 :: xs => x + y
+        case h :: t => h
+        case _ => 404
+    }
+```
+
+Below are examples of recursion on data strucutures. Note they are not tail recursive:
+
+```
+def incrementAll(ints: List[Int]): List[Int] = ints match {
+    case Nil => Nil
+    case x :: xs => x + 1 :: incrementAll(xs)
+}
+
+def doubleAll(ints: List[Int]): List[Int] = ints match {
+    case Nil => Nil
+    case x :: xs => x * 2 :: doubleAll(xs)
+}
+```
+
+### Higher-order function
+As mentioned before, higher-order function is a function that can accept a function as an argument or returns a function.
+
+```
+    // Return elements that satisfy f
+    def filter(xs: List[A], f: A => Boolean) : List[A]
+```
+
+
+Below applyToAll takes two generics; type of A and type of B. These two generics don't have to be the same. One example being when dividing an integer by 2.
+
+```
+// *see how you can implement below using tail recursion
+def applyToAll[A, B](xs: List[A], f: A => B): List[B] = xs match {
+    case Nil => Nil
+    case h :: t => f(h) :: applyToAll(t, f)
+}
+
+// applyToAll in action
+def incrementAll2(ints: List[Int]): List[Int] = applyToAll(ints, (x:Int) => x + 1)
+def doubleAll2(ints: List[Int]): List[Int] = applyToAll(ints, (x:Int) => x * 2)
+```
+
+Some import higher-order functions:
+- map(xs: List[A], f: A => B) : List[B]             // f to all elements and returns a new list.
+- flatMap(xs: List[A], f: A => List[B]) : List[B]   // Like map, but flattens the result to a single list.
+- foldL(xs: List[A], f: (B, A) => B, init: B) : B   // Takes function of 2 arguments and an init value and combines the elements by applying f on the result of each previous application. AKA reduce. init represents some value (like any)
+
+*flatMap appends all the created lists from an element into one single list
