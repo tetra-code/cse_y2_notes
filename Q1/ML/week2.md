@@ -2,7 +2,7 @@
 
 ## Note on notation
 In the bayes theorem formula. The class w is discrete (label), the feature x is continous. So
-p(x|w), p(x) are probability density function and p(w), p(w|x) are probability mass function. Thus posterior probability will have a probability mass function. 
+p(x|w) (likelihood or conditional distribution) , p(x) (unconditional distribution) are probability density function and p(w) (prior probability) , p(w|x) (posterior probability) are probability mass function. Thus posterior probability will have a probability mass function. 
 
 *for this course we are interested in the probabiliy mass function. IN this couse only work with discrete variables
 

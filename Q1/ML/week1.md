@@ -77,9 +77,15 @@ In many cases the posterior probability is hard to estimate, thus we use the *Ba
 
 ![image](../../images/bayes_theorem.PNG)
 
-*class conditional probability* is the probability of a particular feature value x, given the feature is in category wi
+*class conditional distribution*  also known as *likelihood*, is the probability of feature x is observed, given the conditino of class wi.
 
-*class prior* is the probability of a class wi happening
+*unconditional data distribution* is the probability of feature x is observed in any scenario
+
+*class prior probability* is the probability of a class wi happening, which is the assumed knowledge.
+
+*posterior probability* is the probability of a class wi happening, given that feature x occurs, which is what we want to find.
+
+![image]()
 
 ![image](../../images/conditional_probability.PNG)
  
