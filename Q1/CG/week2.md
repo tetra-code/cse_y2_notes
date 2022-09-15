@@ -58,9 +58,22 @@ Remember that
 How to remember order
 
 TRTTR (0, 1, 1) will end up in that place since it is 1 y value above *from where it is facing*, not our point of view
-
-
-
-In this order(T R T R T R), apply to P
-
 If you come from the right the origin is always the reference
+
+
+
+In this order(T R T R T R), apply to P. The order may seem the opposite and they are. but when we concate the multiple matrices to creat ea composite matrix transformation, it reads from left to right:
+
+1. RP , rotate around the origin
+2. TRP, move the vertex not the origin
+3. RTRP, rotate around the origin
+4. TRTRP
+5. RTRTRP
+6. TRTRTRP 
+
+Basically P' = (T*R*T*R*T*R)*P 
+not ()
+
+
+All transformation matrixes are guaranteed to have an inverse to go back to. THus to undo a transformation, by theory multiply by inverse of the transformations. IN CS, due to precision issues of floats and doubles, matrix A multiply by its iverse ins not always the identity matrix. Therefore, it is safer to store each transformation matrix result into a stack and to go back certain steps, pop the stack
+
