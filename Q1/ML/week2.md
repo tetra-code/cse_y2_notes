@@ -112,3 +112,15 @@ question: why only consider multivariate gaussian
 
 With increasing dimensions / # measurements, does
 Gaussian or histogram need more data? -> histogram
+
+
+
+
+For histogram ou can have any distribution so as it increases, need more parameters
+Gaussian is already a normal distruiont so only need mean and covariacnce matrix.
+
+If covariance matrix i sno invertible, one solution is to get more data
+
+Class condition p(x|w) is the gaussian distribution. TO get this, we need the inverse of the convariance matrix (stated in the formula definition)
+
+## Classifiers

@@ -77,3 +77,6 @@ not ()
 
 All transformation matrixes are guaranteed to have an inverse to go back to. THus to undo a transformation, by theory multiply by inverse of the transformations. IN CS, due to precision issues of floats and doubles, matrix A multiply by its iverse ins not always the identity matrix. Therefore, it is safer to store each transformation matrix result into a stack and to go back certain steps, pop the stack
 
+Always build up the composite matrix, then apply the vecor on the rhs
+
+Projecting 3D space to 2D image plane
