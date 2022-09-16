@@ -193,3 +193,96 @@ Some import higher-order functions:
 - foldL(xs: List[A], f: (B, A) => B, init: B) : B   // Takes function of 2 arguments and an init value and combines the elements by applying f on the result of each previous application. AKA reduce. init represents some value (like any)
 
 *flatMap appends all the created lists from an element into one single list
+
+## Laziness
+Laziness is an evaluation strategy which delays the evaluation of an expression until its value is needed. Here you acutally use the keyword *lazy*
+
+Allows to separate defining how you evaluate a value from when you actually evaluate it.
+
+```
+    lazy val x = { println("Evaluates x "); 1}  
+    val y = { println("Evaluates y"); 2}
+    x + y
+
+    // Output:
+    // Evaluates y
+    // Evaluates x 
+```
+
+Laziness is useful for
+- separating pipleine construction form its evaluation
+- No need to read datasets in memory (process in lazy loaded batches)
+- Generate infinite collections
+- optimize executions plans
+
+```
+    val r1 = (1 to 3)
+    .map(x => {
+      println("Mapping")
+      x + 1
+    })
+    .filter( x => {
+      println("Filtering")
+      x % 2 == 0
+    })
+    .sum
+
+    //Output:
+    // Mapping
+    // Mapping
+    // Mapping
+    // Filtering
+    // Filtering
+    //Filtering
+```
+
+```
+      // Working on a lazy list
+  val r2 = (1 to 3).to(LazyList)
+    .map(x => {
+      println("Mapping")
+      x + 1
+    })
+    .filter( x => {
+      println("Filtering")
+      x % 2 == 0
+    })
+    .sum
+
+```
+
+
+Scala lists, maps are eager to output as fast as possible. Lazy lists help form lazy pipelines. In tools like Spark and Flink, we always express computations in a lazy manner. This allows for optimizations before the actual computation is executed
+
+## Monads
+design pattern to define how functions can be used togeter to build generic types.
+Practically, a monad is a value-wrapping type that:
+* Has an identity function * Has a flatMap function, that allows data to be transferred between monad types
+In fp, we want ot return the effect and not mutate with it. 
+In Monad, we wrap the value to keep the effect.
+
+Exceptions are considered side-effect because they hold the state of the problem. E  . Exceptions are not type-safe as they don't return the expected type(we might have expected a double but instead got a exception). So instead of indicating the type to the expected type, *map the effects to the type system using monads*. 
+
+We can use several monads:
+
+- Option: wraps a value that may be null or undefined. Option can have either 2 instances: Some[A], where A represents the type of the value
+- Try: wraps t
+- Future: 
+
+
+## Combine monad with flatMap
+flatMap allows us to join sequences of arbitrary types. 
+
+
+In SCala, object keyword is a singleton and a class is the template to be able to generate more
+
+
+In the Amazon example: login returns Future[Amazon] which we then use flatMap with Future[Amazon].search, which returns a Future[seq[string]]. THerefore type of result is a Future[seq[string]]. In Scala, declaration of the value of Future[T] is Option[Try[T]]. THus result.value is Option[Try[Seq[String]]]
+
+## Big datasets
+In a big data system:
+- client code processes data
+- a data source is a container a data
+
+
+## Conversino or Mapping
