@@ -46,3 +46,7 @@ Pixels are filled if the center is covered. If it is a partial,
 Triangles can have different colors on vertices. THe colors are interpolated over the triangle (graident). This is also called (Rasterization). *aliasing* is when you hide the original represetation with a lower representation (too many to be captured on the pixels). SOMetimes flickering happens when the resolution of the screen/camera can't keep up with resolution of the fine object.
 
 If pixels are partially covered, cliasitng can occur. *super sampling* allows averaging the  . Lose resolution but looks smoother (also known as box filter)
+
+
+## lighting
+when cos goes close to 0, does at perfect light reflecting positoi, you cos bceomes 1 thus get the full effect of the lightning
