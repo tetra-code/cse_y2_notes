@@ -285,4 +285,8 @@ In a big data system:
 - a data source is a container a data
 
 
-## Conversino or Mapping
+Iteration
+
+In the context of BDP, iteration allows us to process finite-sized data sets without loading them in memory at once.
+
+## Conversion or Mapping
