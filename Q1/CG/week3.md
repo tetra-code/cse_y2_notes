@@ -1,5 +1,3 @@
-# Last time 
-
 ## Camera Model
 
 Think of it as nto moving the camera but the camera staying still and everything else moving

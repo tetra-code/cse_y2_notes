@@ -140,24 +140,3 @@ But the points where w = 0 has no correspondence to the vector space. This is be
 This is a way to describe points at infinity and they converge to that central point:
 
 ![Image](../../images/to_infinity.PNG)
-
-## Transformaion with homogenous coordinates
-In a vector space, we simply add the other vector for translation:
-
-![Image](../../images/translation_vector.PNG)
-
-In a projection space, we multiply it by a matrix:
-
-![Image](../../images/translation_matrix.PNG)
-
-The above works by adding x with tx, y with ty, and 1 * 1 for the w. Or when w = 2, it is still the same point because remember, we *scale w down to 1 to get the real coordinates*:
-
-![Image](../../images/same_translation.PNG)
-
-Similar approach for rotation:
-
-![Image](../../images/rotation.PNG)
-
-Same if w > 1:
-
-![Image](../../images/w_rotation.PNG)
