@@ -1,88 +1,195 @@
-# Image
-## Formula
-## Channel
-An image from a standard digital camera will have a red, green and blue channel, thus 3 channels in total. A grayscale image has just 1 channel. 
-## Pixel
-To access a specific pixel (i, j), lets say (3, 4), find the channel 
-With image information we need some information about the width.
- lets say (3, 4), 
-One channel (grayscale) image (resolution 8 x 5) mean it doesn't contain RGB values but only grayscale values. So instead of multiplying by 3 we multiply by 1 (width)
-(j * width + i)
-3*8 + 3
-IF it is RGB, 3 * (4 * 8  + 3)
-TO find a pixel(i, j) give n index I for a graysacle image (resolution 3x3), index I=8
-solution: 
-i = I%width // modulo == remainder of division
-j = I/width                     
-Always check for out of bounds. Unless the compiler is in debug mode, it will not check/test whether it is in bound and it will fail. When you work with tables, always test yourself whether you are inside the range or not to be safe
-# Filter
-## Box filter
-These filters are very simple but powerful. OUr perception is better in dark. IN bright values, hard to detect small changes. In darker values, our eyes are better at detecting. 
-Filter basically applies some computation on each pixel and for each color channel on the pixel
-The nex filtersize = 2 * Filtersize +1 .  We take a filtersize that corresponds around this region. Reformulating this way allows that that filter region always has an in-pair number and the pixel of interest is always in the center
-(2 * filtersize + 1)^2
-Try to avoid the pow() function C++ and use the typical math expression.
-i and j are pixel positions so we do want them to be integers, but for the sum we want them to be float because?
-We need to first make a copy of the image and then store the pixel result in the copied image, to prevent averaging wheat you already averaged
-## Boom filter
-1. start original image
-2. threshold the image (only keep large color values like > 0.9). Depending on the image, instead of immediately dropping down any below threshold value to 0, have a function that makes this transtion smoother.
-3. Apply box filter on thresholded image. THis will result a bit darker image. If too dark, multiply by scalar to scale up the highlighted values.
-4. Add the highlighted values to the original
+# Week 1
+3D models are typically triangles. 
+
+*Projection*: Transforming coordinates to 2D screen
+
+*Rasterization*: Filling screen pixe
+
+## Image
+When specifying image size, we define it as **width * height**
+
+### Pixels
+A image is basically many pixels with different colors combined. Each pixel color can be represented by 3 color components: 
+- Red
+- Green
+- Blue
+
+### Pixels index
+Each value is between 0 ~ 1, typically a continuous value. In practice, they must be discretized, so we assign 8 bit per color component. This gives us 256 available values per color component and 256^3 total combinations. 
+
+The formula for this conversion: **min(v * 255, 255)**
+
+In the memory, each pixel representation is grouped by factor of 3 since RGB. We prefer to use index to map each pixels:
+
+![image](../../images/index_to_pixel.png)
+
+The LHS number corresponds to veritical (width) movement and the RHS number corresponds to horizontal (height) movement. For a RGB pixel (i, j), the memory location (index) is: 
+
+**3 * (j * width + i)**
+
+3 is for the 3 components for each RGB pixel. If we were working with a grayscale image which only has one pixel the memory location is:
+
+**(j * width + i)**
+
+This is because each component takes up 1 index. Width is important thus this info is typically stored in image file as well. Height as well but can be derived from data
+
+Ex) For a grayscale image with resolution (8 * 5), with 8 being the width, the pixel (3, 4) index is
+(4 * 8 + 3) = 35:
+
+![image](../../images/grayscale_index.PNG)
+
+Ex) For a RGB image with resolution (8 * 5), with 8 being the width, the pixel (3, 4) index is
+3*(4 * 8 + 1) = 105:
+
+![image](../../images/rgb_index.PNG)
+
+### Pixels reverse index
+If we want to find a pixel(i, j) given index I for a grayscale image:
+
+**i = I % width** - full rows that fit into I
+**j = I / width** - remainder that offsets in the row
+
+*note that j is an integer division thus 5/3 = 1, not 1.666666666
+
+## Filter
+Filter basically applies some computation on each pixel and for each color channel on the pixel. 
+
+These filters are very simple but powerful. In bright values, hard to detect small changes. In darker values, our eyes are better at detecting. 
+
+### Box Filter
+*Box filter* is literally just a box filter, where we have a center pixel and a box filter that defines how many pixels. It then averages out the pixel value and apply it to the center pixel:
+
+![image](../../images/box_filter.PNG)
+
+![image](../../images/box_filter_result.PNG)
+
+The formula to set the size of our Box Filter is;
+
+**2 * Filtersize + 1** 
+
+*Filtersize* is the size of our pixel of interest. The formula is like the above so that we cover the entire region around the center pixel and that the pixel of interest can be at the center:
+
+![image](../../images/box_filter_pixel.PNG)
+
+Thus the box filter size is (2 * Filtersize + 1) * (2 * Filtersize + 1)
+
+Notes:
+- Avoid the pow() function in C++ and use the typical math expression like aboe.
+- i and j are pixel positions so we do want them to be integers, but for the sum we want them to be float because.
+- In the box filter code, we first make a copy of the image and then store the pixel result in the copied image, to prevent averaging what you already averaged.
+
+### Boom filter
+1. Copy the original image
+2. Threshold the image (only keep large color values like > 0.9). 
+-> instead of immediately dropping down any below threshold value to 0, have a function that makes this transtion smoother.
+3. Apply box filter on thresholded image. 
+-> This may result in a darker image. If too dark, multiply by scalar to scale up the highlighted values.
+4. Add the highlighted values to the original image
+
 The square box from the boxfilter may be visilbe on the result. You can also have a generla filter. THe sum of the values in the filter image should always be 1, to maintain brightness level.
-Macine learning is simply a successive filterin and thresholding process.
+
+Simply put, Machine learning is a successive filtering and thresholding process, where filtered pixel entires are optimized during training:
+
+![image](../../images/ml_filtering.PNG)
+
 ## Storing
 There are several formats for images. Two major categories:
-- Compress data but lose details. Relatively small space - JPEG
-- Lossless but require more space - PPM
+- Lossy, complex, small space - JPEG
+- Lossless, simple, large space - PPM
+
 ### PPM
-PPM image consists of a header and iamge data. Header specifies all meta data. It contains for example:
-- magic number, e.g. P3 for human readable (the big array part) pixel values in RGB format
-- IMage width, whtie space, IMage hieght, white space
-- Maximum color value between [0, 65535]. MOre pricision than 8 bit
-IN the example, you will see that 15 is the hightest number in any pixel. THus max color value is 15.
-PPM is simple but inefficient in storage. THe size directly relates to the bytes per color channel (if not human-readable)
-and resolution
+PPM image is lossless, simple, and takes up large space. It consists of a header and image data (body). Header specifies all meta data. The header contains
+
+- *magic number* - e.g. P3: for human-readable (the big array part) pixel values in RGB format
+- Image width <Whitespace> Image hieght <Whitespace>
+- Maximum color value between [0, 65535] (more precise than 8 bit)
+
+IN the example, you will see that 15 is the hightest number in any pixel. Thus max color value is 15.
+
+![Image](../../images/ppm.PNG)
+
+PPM is simple but inefficient in terms of storage. Size directly relates to
+- bytes per color channel (if not human-readable)
+- resolution
+
 ### JPEG
-JPEG is much more complicated than PPM. you won't have to reproduce JPEG images
-Basically trying to represent the functions within an image
-COmpression by reducing the quality (lossy). THe compression ratio 1:10 still results in high quality images. THe main idea is to use frequencey decomposition and remove high frequency first. THis means that if the. 
-FOr each of the functions in the image, the coefficient values of the functions that change very little will be 'larger' and the ones that change frequently will be 'small'
-Because we discard very small changes, the quality has limitations. You can see very closely in JPG files that when zoomed in the transition is not smooth
-When working with JPEG images, it requires more memory in RAM compared to storage in HARD DISK
-## Linking ALgebra with GPU
-It takes a triangle and projects it onto a screen. Linear perspective: haveing one point where everything is converging. This was present since middle ages art
-On a checker board from a linear perspective, how to find the distances between these horizontal lines. When the checkboard turns, the central point will lie somewhere on a horizontal line. The intersection from the original point lines (check the picture for detailed explanation). YOu can do the same for another point on the opposite side and you can create *two point perspective*.
-## Linear perspective
-It is relatively easy because with projective geometry everyting is lienar using homongeous equations.
+JPEG is much more complicated than PPM. Compression is achieved by reducing the quality (lossy). Regardless, a compression ratio of 1:10 still results in high quality images. Basically, it uses *frequencey decomposition* by removing high frequency waves first to compress. High frequency means the period is shorter, not a bigger difference from top to bottom. 
+
+![Image](../../images/frequency_wave.jpg)
+
+In JPEG, each image is separated into multiple groups, with each group consisting of 8 x 8 pixels. A group is represented by a *cosine function*, which itself is represented by multiple *consine waves*, specifically 64 different cosine waves: 
+
+![Image](../../images/sphinx.PNG)
+
+To determine how to get the combination of colors in the pixel group, we have to determine the cosine function and thus what the weights (coefficients) are for each 64 different cosine waves. This is called *discrete cosine transform*
+
+![Image](../../images/apply_cosine_wave.PNG)
+
+We start off with a low frequency cosine wave and gradually add more cosine waves with higher frequency. This will later converge into a *Fourier series*:
+
+![Image](../../images/fourier_series.png)
+
+The lower frequency consine waves will have a higher impact on the image than the higher frequency cosine waves. Generally higher frequency cosine waves don't contribute much to the image, thus have very subtle effect on the actual image. Thus if we remove the high frequency cosine waves, the image will be almost identical. As shown below, the part with a high frequency is removed by the function (red):
+
+![Image](../../images/disregard.PNG)
+
+Only by really zooming in on the image you will see that there is some difference:
+
+![Image](../../images/difference.PNG)
+
+In conclusion, JPEG represents the image with multiple cosine functions
+
+For each of the functions in the image, functions that change very little will have large coefficient values and the ones that change frequently will have small coefficient values:
+
+When working with JPEG images, takes up more space in RAM than compared to space in a hard disk.
+
+## Linking algebra with GPU
+In a GPU, things are projected in 3D. But a GPU's job is also to project a 3D model onto a 2D screen:
+
+![Image](../../images/3d_to_2d.PNG)
+
+This can be done with *linear perspective*. *Linear perspective* is having one point where everything converges to. When the checkboard turns, the central point will lie somewhere on a horizontal line. 
+
+To calculate the distance between two sections of a vertical lines, we calculate the intersection from the original point lines:
+
+![Image](../../images/intersection.PNG)
+
+You can move the central point along the horizontal line to the opposite side and you can create *two point perspective*:
+
+![Image](../../images/two_point_perspective.PNG)
+
+
+In *projective geometry* everyting is lienar using homongeous equations.
+
 ## Virtual Camera model
-Given a 3d point, find a function that results in the points projection in the photo. As the camera moves or the object moves, the image will be the same. ON the graphics card, the image is always the same, we just change our perspective. 
-To translate an image (vertices), add a vector to our vertices.
-To rotate an iamge, use matrix multiplication with the cos, sin matrix
-Combine these to calculate the perspective projection. For the computer to calculate where to project it on the screen. In 2D perspective: calculate v by using the ratio of similar triangles. IMage:
+Given a 3D point, find a function that results in the points projecting on to a 2D image. As the camera moves or the object moves, the image will be the same. On the graphics card, the 3D object is always the same, we just change our perspective on the 2D screen. 
+
+![Image](../../images/point_projection.PNG)
+
+Movement and orientation in 2D is simple:
+
+- To translate an image (vertices), add a vector to our vertices.
+- To rotate an iamge, use matrix multiplication with the cos, sin matrix
+![Image](../../images/rotation_multiplication.PNG)
+
+Combine these to calculate the *perspective projection*, which is a design technique used to display a 3D object on a 2D surface.
+
+![Image](../../images/projectors.PNG)
+
+For the computer to calculate where to project it on the screen, use the ratio of similar triangles:
+
+- v/f  =  Y/Z
+- u/f  =  X/Z
+
+![Image](../../images/calculation0.PNG)
+
+![Image](../../images/calculation.PNG)
+
 Naive operation to project a scene point with the camera:
-Apply camera position (add offset)
-Aply rotation (matrix mul)
-APply projection (non linear scaling)
+1. Apply camera position (add offset)
+2. Apply rotation (matrix mul)
+3. Apply projection (non linear scaling)
 
-This can become complicated. A better way is to unify translation, rotation and projection. But because translations and projections are not linear  we can't use matrixes. Instead use homogenous coordinates from projective geometry. 
+This can become complicated. A better way is to unify translation, rotation and projection with a matrix multiplication. But because translations and projections are not linear we can't use matrixes with mere 2D values. Instead use *homogenous coordinates* from projective geometry. Homogenous coordinates are 3-vector that can represent 2D coordinates 
 
-A camera projection is a matri and combining matrices allows us to define hierarchical-object dependencies.
-A camera projection is a matri and combining matrices allows us to define hierarchical-object dependencies.
-
-## HOmogenous coordinates
-An N-dimensional projective space Pn is represented by N+1 coordinates. No null vectors
-
-Two points p,q are equal iff exists a != 0 s.t p*a = q 
-
-IN a 2D projective space P2,
-(2,2,2) = (3,3,3,) = (4,4,4)
-(3, 3, 3) != (4, 3, 4)
-(0, 1, 0) = (0, 2, 0)
-
-To embed a standard vectors space Rn into an n-D projective space Pn, we can map
-Take Rn add a 1 to its end 
-
-A point (x, y) in R2 embbed in a projective space corresponds to (x, y, 1). All points (x, y, 1) form a plane, called as *affine plane*. ALl these poitns are basically lines, simply scaled with a scalar.
-
-Thus we can go back to R2 by dividing the corodintes by the last entry. (x, y, w) in P2 corresponds to (x/w, y/w) R2. But the poitns where you have zero in the end, has no correspondence to R2. The plane with w=0 is not reachable. THese points with w=0, as you drag w near towards 0, the points go towards infinity. THis is away to decribe poitns at infinit, and they converge to that central point! This isthe key to transform ojcets using projective geometry
+A camera projection is a matri and combining matrices allows us to define *hierarchical-object dependencies*.

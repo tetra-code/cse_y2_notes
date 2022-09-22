@@ -1,3 +1,46 @@
+# Week 2
+
+## Homogenous coordinates
+Goal: given 3D point M, we want a function C such that C(M) is the point’s projection in a 2D photo
+
+As mentioned before, homogenous coordinates can represent N-D projective space with N + 1 coordinates in vector forms. Null vectors (0, 0, 0) are not part of the space. 
+
+A group of vectors are considered homogenous coordinates if they satisfy the following condition:
+
+*Two points p,q are equal iff exists a!=0 s.t p * a = q*
+
+Example:
+In a 2D projective space of P2:
+
+(2,2,2) = (3,3,3,) = (4,4,4)
+(3, 3, 3) != (4, 3, 4)
+(0, 1, 0) = (0, 2, 0)
+
+If we have a vector from a standard *vector space* Rn and want to represent this in an N-Dimensional *projective space*, add a 1 to its end. A point (x, y) in R2 embbed in a P2 corresponds to (x, y, 1)
+
+Example:
+(1, 4) in R2 => (1, 4, 1) in P2
+
+All points (x, y, 1) form a plane, called as *affine plane*:
+
+![Image](../../images/plane.PNG)
+
+ALl these points are basically lines, simply scaled with a scalar.
+
+(x, y, w) in 2D projection space corresponds to (x/w, y/w) in 2D vector space. Only when the 'w' = 1 is the x, y value same as in both projection and vector space.
+
+Only when w != 0 is there point in the projection space that corresponds to the point in the vector space.
+
+But the points where w = 0 has no correspondence to the vector space. This is because the plane with w = 0 is not reachable. The points with w=0, as you drag w near towards 0, the points go towards infinity:
+
+![Image](../../images/w_0_1.PNG)
+
+![Image](../../images/w_0_2.PNG)
+
+This is a way to describe points at infinity and they converge to that central point:
+
+![Image](../../images/to_infinity.PNG)
+
 ## Transformaion with homogenous coordinates
 In a vector space, we simply add the other vector for translation:
 
