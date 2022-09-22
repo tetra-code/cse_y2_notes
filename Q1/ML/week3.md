@@ -110,3 +110,23 @@ So with the same data set, we can get two different diviosn class
 
 Problem with naive bayes:
 If the features covary, they aren't indenpendent and naive bayes strong assumes indenpendence.
+
+## Discriminiative classifiers
+There are 2 types of classifiers
+- gnerative classifiers (parametic densitives, non-parametric densitites)
+- discriminiative classifiers (support vector, decision tree, neural network)
+
+Discriminative models draw boundaries in the data space, while generative models try to model how data is placed throughout the space.
+
+![Image](../../images/discrminiatve_generative.png)
+
+Small datasets require models that have low complexity (or high bias) to avoid overfitting the model to the data. the simpler the machine learning algorithm, the better it will learn from small data sets. Naive Bayes algorithm is among the simplest classifiers and as a result learns remarkably well from relatively small data sets. 
+
+For very small datasets, Bayesian methods are generally the best in class, although the results can be sensitive to your choice of prior. I think that the naive Bayes classifier and ridge regression are the best predictive model
+
+Small datasets, you need models that have few parameters (low complexity) and/or a strong prior. You can also interpret the “prior” as an assumption you can make on how the data behaves.
+
+Misclassification cost, 
+
+
+NEed independent data (data not used in training).Assume random subset of the data in the graph and another random subset are independent. But doesn't sometimes hold, when time is a factor(frame based detection in video, and all these deep detection algorithms fail). SO make sure you use different types of videos for testing, not just a few ones
