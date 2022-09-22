@@ -130,3 +130,16 @@ Misclassification cost,
 
 
 NEed independent data (data not used in training).Assume random subset of the data in the graph and another random subset are independent. But doesn't sometimes hold, when time is a factor(frame based detection in video, and all these deep detection algorithms fail). SO make sure you use different types of videos for testing, not just a few ones
+
+
+
+When selecting your object features, it is very important which feature you choose so that 
+it represents a true distribution type in real life. If you had a model that can detect well certain object A but then started introducing only 'outliers' in the training data set, it is very likely that your model will become worse at predicting, because only ourlier filled training data set is not a true representation of the distribution of real life occurences.
+
+## ML learning curve
+As size of the training set increases, the classification error also increases. But this isn't linear. At some point, the more data you have the more likely it will truly represent the distriution type of real life occurence for that object 
+
+*Bayes error* is smaller than the asympototic error - bayes eror assuems ideal distribution
+
+## Bias variance tradeoff
+When given some data, we could get unlucky and get a-typical data. TO say something gneral, we need to average over different training sets. 
