@@ -89,13 +89,28 @@ Since matrix multiplication is not commutative (not all AB != BA), thus order ma
 
 T * S * P = P'         S * T * P != P'
 
+Three main operations to transformation:
+
+- Scale (scale by z axis by 5, multiply the vector (1, 1, 5))
+- Translation
+- Rotation
+
+To remember:
+- Scaling should always come first before any other operation 
+- for translation only give value that you want to move. otherwise, 0 for the rest (not 1)
+- If an object is on the origin and we rotate by an axis, it will rotate while the object is still in the current location.
+- If an object is on the origin and we first translate and then rotate by an axis, the translated coordinates will also be affected by the rotation, thus the translated distance will also be rotated.
+- Not possible to achieve same-location rotation while the coordinates is not in the center and rotate by an axis
+
+
 ## Complex objects
-Objects are often defined as many components. It is the result of multiple objects at precise coordinaes of each other. We concatenate matrices to place objects
+Objects are often defined as many components. It is the result of multiple objects at precise coordinaes of each other. We concatenate matrices to place objects. 
 
 Lets say a group of matrices make a complex arm object of multiple components. If we apply a new matrix in the beginning, it will propagate to the rest of the matrices and the whole arm will move based on the new added matrix:
 
 ![Image](../../images/propagaion.PNG)
 
+### Order
 As mentioned before the order matters. Say you want to apply operations to a point P in this order:
 1. T
 2. R
@@ -103,7 +118,6 @@ As mentioned before the order matters. Say you want to apply operations to a poi
 4. T
 5. T
 6. R
-
 
 If we apply the matrix operation one at a time to the point, it should be 6, 5, 4, 3, 2, 1. But if we concate matrices to create one composite matrix transformation, the *order is reversed*: 1, 2, 3, 4, 5, 6. To show you it's true:
 
@@ -118,6 +132,59 @@ In short:
 
 P'  = (T * R * T * T * T * R) * P 
     =  R * T * T * T * R * T  * P
+
+In coding, the first operation is usually the very last argument.
+
+### Robot arm
+After the cube, when we want to apply an operation to its whole, the operation should be applied at the very last thus after it is finished creating parts for cube. THis is to ensure the entire cube is affected by the operation in the end.
+
+When drawing a segment that is influenced by a previous one, operations are involved that take part from the previous segment in order to be influenced by the previous segment's movement as well.
+
+If segment3 exists after segment1 and segment2, the *order of applying the previous operations should be reversed*. For segment3 operation:
+
+1. segment3's translation
+2. segment3's rotation
+3. apply segment2's translation
+4. apply segment3's rotation
+5. apply segment1's translation
+6. apply segment2's rotation
+
+```
+    glm::mat4 matrix_segment1 = 
+        glm::rotate(id, segment1.rotationX, x_axis) * 
+        glm::scale(id, segment1.boxSize) * 
+        centering;
+
+    glm::mat4 matrix_segment2 = 
+        // Operation to allign with segment1:
+        glm::rotate(id, segment1.rotationX, x_axis) * 
+        glm::translate(id, { 0, 0, segment1.boxSize.z } ) *
+
+        // Segment2's self operation
+        glm::rotate(id, segment2.rotationX, x_axis) * 
+        glm::scale(id, segment2.boxSize) * 
+        centering;
+
+    glm::mat4 matrix_segment3 =
+        // Operation to allign with segment1:
+        glm::rotate(id, segment1.rotationX, x_axis) *
+        glm::translate(id, glm::vec3 { 0, 0, segment1.boxSize.z }) *
+
+        // Operation to allign with segment2:
+        glm::rotate(id, segment2.rotationX, x_axis) *
+        glm::translate(id, glm::vec3 { 0, 0, segment2.boxSize.z }) * 
+
+        // Segment3's self operation
+        glm::rotate(id, segment3.rotationX, x_axis) * 
+        glm::scale(id, segment3.boxSize) * 
+        centering;
+```
+
+The below image depicts that after finishing applying segment2's rotation, we apply segment1's translation.
+
+![Image](../../images/robot_arm.PNG)
+
+### Reverse transformation
 
 Remember that (0, 0, 1) vector is the origin in 2D space
 
