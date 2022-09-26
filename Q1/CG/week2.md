@@ -228,6 +228,8 @@ To keep track of the *hierarchical objects* walk over the tree using DFS. Use a 
 ![Image](../../images/tree_traversal.PNG)
 
 ## 1. Transformation, 2. Projection, 3. Viewport
+
+### Projection
 After transformation, we have to apply the projection to finally be able to project a 3D point onto our 2D screen. This was straight-forward with our naive approach and using 3-value vector for 3D projection space. 
 
 ![Image](../../images/find_m.PNG)
@@ -242,11 +244,12 @@ But there is a solution; Z can easily be removed by scaling by Z. Remember that 
 
 ![Image](../../images/solution.PNG)
 
+### Viewport
 Not that our point is on our *image plane*, we now have to calculate how large the image is. The image plane has a width and height range of (-1, 1):
 
 ![Image](../../images/image_plane.PNG)
 
-We take this image plane and transform it into a [0 * width - 1] * [0 * height - 1] matrix called a *viewport*:
+*Viewport* is simply mapping our projection onto pixels for dispasly. We take the image plane and transform it into a [0 * width - 1] * [0 * height - 1] matrix called a *viewport*:
 
 ![Image](../../images/viewport.PNG)
 
@@ -254,17 +257,3 @@ After finding the matrix *viewport* our camera model is finally complete:
 
 ![Image](../../images/camera_model.PNG)
 
-## Last but not least
-From the above camera model pipeline, the Z value is lost as we project 3D points on to 2D screens. The Z coordinate is actually important as the GPU compares new distance to stored distance and only updates the pixel if new distance is nearer. 
-
-Because the Z value is lost during projection, the projection matrix from the pipeline must be extended. But a 3D scene is infinite. To represent Z, add a near and far clipping plane:
-
-![Image](../../images/near_far_plane.PNG)
-
-![Image](../../images/near_far.PNG)
-
-For near=2 and far = 4 calculate the projection of (0,0,-2,1). 
-
-Result of final pipeline:
-
-![Image](../../images/final_pipeline.PNG)

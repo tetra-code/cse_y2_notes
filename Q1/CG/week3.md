@@ -1,55 +1,184 @@
-## Camera Model
+# Week 3
+As *frustrum* is the portion of a solid that lies between one or two parallel planes cutting it:
 
-Think of it as nto moving the camera but the camera staying still and everything else moving
+![Image](../../images/frustrum.png)
 
-To go from a 2D space to a 3D space:
-The *camera model* matrix multiplicatoin:
+To go from a 3D space to a 2D space, use the *camera model* matrix multiplication:
 
 pixel mapping (image) *  "standard camera" projection (projection) *  deforms scene (orientation/location)
 
-The flattening takes away the depth 
+## Final camera model pipeline
+Image of camera model pipeline from last time:
 
-*frustrum* is frustum is the portion of a solid that lies between one or two parallel planes cutting it.
+![Image](../../images/camera_model.PNG)
 
-## Depth value
-In a 3D infinite scene, how do we represent Z? -> add a *near plane* and *far plane*
+From the above camera model pipeline, the Z value is lost as we project 3D points on to 2D screens. The Z coordinate is actually important as *the GPU compares new distance to stored distance and only updates the pixel if new distance is nearer*. Simply put, we lost the depth of the projection.
 
-Sometimes in games or simulatinos, things pop up out of nowhere. This is because these things were in the far plane (which we don't care) and then . Nowadays doesn't happen often and instead it is replaced with a fog or something to hide it
+Because the Z value is lost during projection, the projection matrix from the pipeline must be extended. But a 3D scene is infinite. To represent Z, add both *near clipping plane* and *far clipping plane*:
 
-# Week 3
-NOrmally we project based on a square (not the true size of our screen) When a screen is wider, squeeze the entire scene by a certain factor along the x axis (width). This scaling is done at the END, not beginning
+![Image](../../images/near_far_plane.PNG)
 
-The z axis we see inside the (box) are negative axis.
+Sometimes in games or simulatinos, things pop up out of nowhere. This is because these things were in the far plane (which we don't care) and then within the near plane. Nowadays doesn't happen often and instead it is replaced with a fog or something to hide it. Other times you can get near an object and can at some point see inside of it. THat's because you cross the 'near plane'
 
-(this purple dot may seem like its half between green and blue thus 0 but acutally not. we don't know. it is anywhere from -1 < z < 1 ) it is not the actual distance of camera observer
+As mentioned before, OpenGL conventions has the camera looking along the negative z-axis:
 
-it is -near and -far as it i son the negative z axis
+![Image](../../images/near_far.PNG)
 
-IN order:
-- The MOdelview Matrix takes the local origin into the 3D space. 
-- PRojection
-- Viewport (take values -1 1 and maps )
+NOrmally we project based on a square. When a screen is wider, it squeezes the entire scene by a certain factor along the x axis (width). The *screen mapping* at the top right scales the scene such that the square image appears correctly strectched. This scaling is done at the END, not beginning:
+
+![Image](../../images/scaling_square.PNG)
+
+This is scaling/stretching is necessary since most displays are rectangles, not squares.
+
+Let's say a green dot is on the far plane and blue dot is on the near plane. Then the points inside the frustrum have R3 coordinates in [-1, 1]3 domain:
+
+![Image](../../images/frustrum_domain.PNG)
+
+Projection is basically mapping the contents (points) of the frustum inside a cube:
+
+![Image](../../images/into_cube.PNG)
+
+The result is that content closer to the near plane will appear closer and contet further to the near plane will appear further:
+
+![Image](../../images/mapping.PNG)
+
+Since we are now considering Z coordinate (depth) as well, our *viewport* from the previous lecture changes from 3x3 to 4x4:
+
+![Image](../../images/new_viewport.PNG)
+
+Result of final pipeline:
+
+![Image](../../images/final_pipeline.PNG)
 
 The above multiplied together gets us a single 4 x 4 camera matrix
 
-Sometimes you can get near an object and can at some point see inside of it. THat's because you cross the 'near plane'
 
 
+For near = 2 and far = 4 calculate the projection of (0,0,-2,1). 
 
-The above works well for but fails for triangles. For points (vertices ) that are outside of our *cross frustum*, we need to test triangles and clip it . THis only necessary for outside (Crosses) our frustum. Everything inside is taken care of
+## Triangle clipping
+The above works well for individual points but fails for triangles. For parts of a triangle that are ouside of the frustum, we need to clip the crossing part. Everything inside the frustum is taken care of.
 
-After projection a triangle is a cube and after if they are not inside -1 and 1, then we know they are outside. 
+We clip the triangles AFTER applying the projection matrix. Thus we know whether a triangle is (partially) outside the cube if they are not inside the [-1, 1] range. 
+![Image](../../images/clip_triangles.PNG)
 
-Pixels are filled if the center is covered. If it is a partial, 
+## Rasterization
+*Rasterization* is basically filling the sceren pixels to represent the image we get after the camera model pipeline. A pixel is filled if its center is covered:
 
-## Making things beautiful
-Triangles can have different colors on vertices. THe colors are interpolated over the triangle (graident). This is also called (Rasterization). *aliasing* is when you hide the original represetation with a lower representation (too many to be captured on the pixels). SOMetimes flickering happens when the resolution of the screen/camera can't keep up with resolution of the fine object.
+![Image](../../images/rasterization.PNG)
 
-If pixels are partially covered, cliasitng can occur. *super sampling* allows averaging the  . Lose resolution but looks smoother (also known as box filter)
+This is why we get higher quality images if there are more pixels available to represent the image. A 4K TV (ultra high definition) has over eight million pixels (3840 x 2160).
 
+![Image](../../images/image_resolution.PNG)
 
-## lighting
-when cos goes close to 0, does at perfect light reflecting positoi, you cos bceomes 1 thus get the full effect of the lightning
+Triangles can have different colors on vertices. If two points are yellow and the other point is red, then the pixel color values between these three points are created based on these three. This is called *interpolation*. It will look like a gradient effect:
+
+![Image](../../images/interpolation.PNG)
+
+The color values are extracted at the pixel centers:
+
+![Image](../../images/pixel_centers.PNG)
+
+*Aliasing* is the visual stair-stepping of edges that occurs in the image. It is the result when you hide the original represetation with a lower representation (too many to be captured on the pixels) or when pixels are partially covered.
+
+This can be solved with *anti-aliasing* which is smoothing the jagged edges. One way is *super sampling*: render at higher resolution then reduce resolution by averaging the colors of the neighboring pixels. Results in lower resolution but smoother images:
+
+![Image](../../images/super_sampling.PNG)
+
+The *super sampling* can choose a filter to do the averaging, with a popular one being the *box filter* as mentioned in week 1.
+
+## Shading (ligh reflection)
+In order to make 2D images look 3D, we have to apply *shading* or light reflection. We can use the *gonioreflectometer* to get all the precise light reflection data but it is often costly. So instead we mostly use mathematical models. It has the following properties:
+
+- describes light interaction as a function
+- more lightweight than the database from the instrument
+- parameters to control appearance
+- acquired materials can be approximated
+
+One of the most popular mathematical model is the *Phong model*:
+
+![Image](../../images/phong_model.PNG)
+
+As mentioned before, we describe the color in 3 *cone types* (channels): Red, Green, Blue. Each color channel is represented as a single wavelength (cosine function) and we describe the model for a single color channel, thus do it 3 times.
+
+![Image](../../images/color_graph.PNG)
+
+The phong model has three properties/fucntions:
+
+- Ambient
+- Diffuse
+- Specular
+
+The variables represent the color properties in RGB, thus a tuple with 3 floats in range [0, 1].
+
+### Phong model: Ambient
+The *ambient* mimics the *scene light* which is reflections from neighboring surfaces. It is used to account for the small amount of light that is scattered about the entire scene. 
+
+![Image](../../images/ambient.PNG)
+
+The light property's value (I) is typically between [0, 1] (i.e  (0.9, 0.9, 0.9)).
+
+![Image](../../images/ambient_term.PNG)
+
+The ambient term doesn't actually indicate the shape of the object as it only approximates the indirect light:
+
+![Image](../../images/ka_increase.PNG)
+
+![Image](../../images/ambient_in_practice.PNG)
+
+### Phong model: Diffuse
+The *diffuse* property is the reflected light intensity from a surface such that the light scatters in many different angles rather than just one same angle. This tends to be the case when light is reflected off of rough surfaces like clothing, paper and asphalt. 
+
+![Image](../../images/specular_diffuse.PNG)
+
+The ideal diffuse reflection is equal luminance when the object is viewed from all directions. Surfaces that do this are called *Lambert Surfaces*. 
+
+The angle from the cosine is the angle between the light origin vector and the normal vector from point on surface (x). 
+
+![Image](../../images/diffuse.PNG)
+
+The diffuse term indicates the shape of the object and does NOT depend on observer position (looks same from all position)
+
+![Image](../../images/kd_increase.PNG)
+
+![Image](../../images/diffuse_example.PNG)
+
+Careful: the light should always come from above
+the surface, otherwise, it should stay black.
+What does this mean for the angle 
+
+### Phong model: Specular
+The *specular* property is the reflected light intensity from a surface such that the light scatters in all the same angle (unlike diffuse). This tends to be the case when light is reflected off of smooth or glossy surfaces like a mirror. This results in that specific area being much more luminous than the rest:
+
+![Image](../../images/specular_reallife.PNG)
+
+The angle from the consine here is between the view (camera) direction and the ideal reflection direction (reflected light direction calculated by getting the normal vector of surface point x)
+
+![Image](../../images/falloff.PNG)
+
+'n' is the shininess of the surface (not light source), whereas *I* is the intensity of the light source.
+
+As the specular reflection coefficient (Ks) increases, the glossy reflected light intensity also increases. As 'n' (surface shinness) or the angle increases, the glossy reflected light intensity *decreases*. This is because as this angle increases, the number of *micro-facets* (mirros making up the surface) reflecting light towards the eye decreases, hence the decrease in brightness. 
+
+![Image](../../images/specualr_chart.PNG)
+
+### Phong model: Optional
+There is one more extra property called *emission*. This equivalent to ambient with light set to 1. This is used when the object emits light like hot glowing metal.
+
+### Shading techniques
+There are several shading techniques that makes use of the phong model:
+
+- *Flat shading*: applies *phong model* to produce color per face 
+- *Gouraud shading*: applies *phong model* to produce color per vertex, interpolate color from vertices over triangle
+- *Phong shading*: applies *phong model* to produce color per pixel, interpolate parameters of *phong model*
+
+Phong shading is one the most used techniques as it computes the color result per pixel. This is done by interpolating the normals (not color) of vertices over pixels:
+
+![Image](../../images/different_normals.PNG)
+
+The result is an image with much smooth sepcularities:
+
+![Image](../../images/phong.PNG)
 
 
 ## OpenGL tutorial
