@@ -87,7 +87,7 @@ This can be solved with *anti-aliasing* which is smoothing the jagged edges. One
 
 The *super sampling* can choose a filter to do the averaging, with a popular one being the *box filter* as mentioned in week 1.
 
-## Shading (ligh reflection)
+## Shading (light reflection)
 In order to make 2D images look 3D, we have to apply *shading* or light reflection. We can use the *gonioreflectometer* to get all the precise light reflection data but it is often costly. So instead we mostly use mathematical models. It has the following properties:
 
 - describes light interaction as a function
@@ -140,6 +140,8 @@ The angle from the cosine is the angle between the light origin vector and the n
 The diffuse term indicates the shape of the object and does NOT depend on observer position (looks same from all position)
 
 ![Image](../../images/kd_increase.PNG)
+
+Below we calculate both the diffuse and ambient value. If we add them all up, we get the resulting color
 
 ![Image](../../images/diffuse_example.PNG)
 
