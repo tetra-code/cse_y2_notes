@@ -61,4 +61,11 @@ Commit index is at 7 in the slides. The oens that don't have commit nidex 7 must
 Leader appends 9 and then crash wihtout replicate. In taht case only middle can be leader since it has the hightest latest. 
 *different colors repreent each term (commites made during different leadership)
 
-FOr the ones without all the commits, those nodes will  get updated once back into the network AND hear from the leader
+FOr the ones without all the commits, those nodes will  get updated once back into the network AND hear from the leader. Before being elected asleader, we must update the term
+
+Raft can 
+## Distrubted database
+For sync, if another operation in the queue, need to wait until the current one is done for ALL the followers.
+For asyn if leader goes down, no way of knowing which nodes successed and which ones failed. In addition all nodes not guaranteed to have same consistent state since each process and finish time can be different and can have different states at a given point.
+
+Hybrid async and sync: 
