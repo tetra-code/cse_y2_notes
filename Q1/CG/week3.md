@@ -116,7 +116,9 @@ The *ambient* mimics the *scene light* which is reflections from neighboring sur
 
 ![Image](../../images/ambient.PNG)
 
-The light property's value (I) is typically between [0, 1] (i.e  (0.9, 0.9, 0.9)).
+Here the *light property* means the light color, thus RGB in a tuple. The light property's value (I) is typically between [0, 1] (i.e  (0.9, 0.9, 0.9)).
+
+The *surface property* means the reflectance of surface. 
 
 ![Image](../../images/ambient_term.PNG)
 
@@ -136,6 +138,8 @@ The ideal diffuse reflection is equal luminance when the object is viewed from a
 The angle from the cosine is the angle between the light origin vector and the normal vector from point on surface (x). 
 
 ![Image](../../images/diffuse.PNG)
+
+The *surface property* means the diffuse reflectance of surface. 
 
 The diffuse term indicates the shape of the object and does NOT depend on observer position (looks same from all position)
 
@@ -166,6 +170,10 @@ As the specular reflection coefficient (Ks) increases, the glossy reflected ligh
 
 ### Phong model: Optional
 There is one more extra property called *emission*. This equivalent to ambient with light set to 1. This is used when the object emits light like hot glowing metal.
+
+The final result of combing all ambient, diffuse, and specular:
+
+![Image](../../images/final_result.PNG)
 
 ### Shading techniques
 There are several shading techniques that makes use of the phong model:
