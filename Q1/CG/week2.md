@@ -111,29 +111,30 @@ Lets say a group of matrices make a complex arm object of multiple components. I
 ![Image](../../images/propagaion.PNG)
 
 ### Order
+The Matrix object can store a single transformation or a sequence of transformations. A sequence of transformations is called a composite transformation, which is a result multiplying the matrices of the individual transformations. 
+
 As mentioned before the order matters. Say you want to apply operations to a point P in this order:
-1. T
+1. S
 2. R
 3. T 
-4. T
-5. T
-6. R
 
-If we apply the matrix operation one at a time to the point, it should be 6, 5, 4, 3, 2, 1. But if we concatonate matrices to create one composite matrix transformation, the *order is reversed*: 1, 2, 3, 4, 5, 6. To show you it's true:
+The point p is generally on the far right side of the equation. Thus the order of applying this one by one will be 1, 2, 3. 
 
-1. RP , rotate around the origin
-2. TRP, move the vertex not the origin
-3. TTRP, rotate around the origin
-4. TTTRP
-5. RTTTRP
-6. TRTTTRP 
+For applying the transformation one by one, P is multiplied from right to left:
 
-In short:
+Left                 Right
+<-----------------------
+P' = T * R * S * P
 
-P'  = (T * R * T * T * T * R) * P 
-    =  R * T * T * T * R * T  * P
+For creating a composite transformation and then P, P is multiplied from left to right:
 
-In coding, the first operation is usually the very last argument.
+Left                 Right
+---------------------->
+P' =  (T * R * S) * P
+
+As shown above the direction of the multiplication doesn't affect the result, ONLY THE ORDERING OF THE TRANSFORMATIONS.
+
+When in doubt always assume we are applying one by one thus right to left direction.
 
 ### Robot arm
 After the cube, when we want to apply an operation to its whole, the operation should be applied at the very last thus after it is finished creating parts for cube. This is to ensure the entire cube is affected by the operation in the end.
@@ -260,4 +261,3 @@ The above f stands for *focal length* and it is the distance from the camera to 
 After finding the matrix *viewport* our camera model is finally complete:
 
 ![Image](../../images/camera_model.PNG)
-
