@@ -1,34 +1,27 @@
-# Week 3
-As *frustrum* is the portion of a solid that lies between one or two parallel planes cutting it:
+# Final camera model pipeline
+As **frustum** is the portion of a solid that lies between one or two parallel planes cutting it:
 
 ![Image](../../images/frustrum.png)
 
-To go from a 3D space to a 2D space, use the *camera model* matrix multiplication:
-
-pixel mapping (image) *  "standard camera" projection (projection) *  deforms scene (orientation/location)
-
-## Final camera model pipeline
-Image of camera model pipeline from last time:
+To go from a 3D space to a 2D space, use the **camera model** matrix multiplication:
 
 ![Image](../../images/camera_model.PNG)
 
-From the above camera model pipeline, the Z value is lost as we project 3D points on to 2D screens. The Z coordinate is actually important as *the GPU compares new distance to stored distance and only updates the pixel if new distance is nearer*. Simply put, we lost the depth of the projection.
+From the above camera model pipeline, the Z value is lost as we project 3D points on to 2D screens,. The Z coordinate is actually important as *the GPU compares new distance to stored distance and only updates the pixel if new distance is nearer*. Simply put, we lost the depth of the projection.
 
-Because the Z value is lost during projection, the projection matrix from the pipeline must be extended. But a 3D scene is infinite. To represent Z, add both *near clipping plane* and *far clipping plane*:
+Because the Z-value is lost during projection, the projection matrix from the pipeline must be extended. To represent Z in a 3D scene which is infinite, add both **near clipping plane** and **far clipping plane**:
 
 ![Image](../../images/near_far_plane.PNG)
 
-Sometimes in games or simulatinos, things pop up out of nowhere. This is because these things were in the far plane (which we don't care) and then within the near plane. Nowadays doesn't happen often and instead it is replaced with a fog or something to hide it. Other times you can get near an object and can at some point see inside of it. THat's because you cross the 'near plane'
+Sometimes in games or simulatinos, things pop up out of nowhere. This is because these things were in the far plane (which we don't care) and then within the near plane. Other times you can get near an object and see inside of it because you crossed the near plane.
 
 As mentioned before, OpenGL conventions has the camera looking along the negative z-axis:
 
 ![Image](../../images/near_far.PNG)
 
-NOrmally we project based on a square. When a screen is wider, it squeezes the entire scene by a certain factor along the x axis (width). The *screen mapping* at the top right scales the scene such that the square image appears correctly strectched. This scaling is done at the END, not beginning:
+Normally we project based on a square. When a screen is wider, it squeezes the entire scene by a certain factor along the x axis (width). The **screen mapping** at the top right scales the scene such that the square image appears correctly strectched. This is scaling/stretching is necessary since most displays are rectangles, not squares. *This scaling is done at the END, not beginning*
 
 ![Image](../../images/scaling_square.PNG)
-
-This is scaling/stretching is necessary since most displays are rectangles, not squares.
 
 Let's say a green dot is on the far plane and blue dot is on the near plane. Then the points inside the frustrum have R3 coordinates in [-1, 1]3 domain:
 
@@ -38,7 +31,7 @@ Projection is basically mapping the contents (points) of the frustum inside a cu
 
 ![Image](../../images/into_cube.PNG)
 
-The result is that content closer to the near plane will appear closer and contet further to the near plane will appear further:
+The result is that content closer to the near plane will appear closer and content further to the near plane will appear further:
 
 ![Image](../../images/mapping.PNG)
 
@@ -50,19 +43,15 @@ Result of final pipeline:
 
 ![Image](../../images/final_pipeline.PNG)
 
-The above multiplied together gets us a single 4 x 4 camera matrix
+The above multiplied together gets us a single 4 x 4 camera matrix.
 
-
-
-For near = 2 and far = 4 calculate the projection of (0,0,-2,1). 
-
-## Triangle clipping
+# Triangle clipping
 The above works well for individual points but fails for triangles. For parts of a triangle that are ouside of the frustum, we need to clip the crossing part. Everything inside the frustum is taken care of.
 
-We clip the triangles AFTER applying the projection matrix. Thus we know whether a triangle is (partially) outside the cube if they are not inside the [-1, 1] range. 
+*We clip the triangles AFTER applying the projection matrix.* Thus we know whether a triangle is (partially) outside the cube if they are not inside the [-1, 1] range. 
 ![Image](../../images/clip_triangles.PNG)
 
-## Rasterization
+# Rasterization
 *Rasterization* is basically filling the sceren pixels to represent the image we get after the camera model pipeline. A pixel is filled if its center is covered:
 
 ![Image](../../images/rasterization.PNG)
@@ -71,7 +60,7 @@ This is why we get higher quality images if there are more pixels available to r
 
 ![Image](../../images/image_resolution.PNG)
 
-Triangles can have different colors on vertices. If two points are yellow and the other point is red, then the pixel color values between these three points are created based on these three. This is called *interpolation*. It will look like a gradient effect:
+Triangles can have different colors on vertices. If two points are yellow and the other point is red, then the pixel color values between these three points are created based on these three. This is called **interpolation**. It will look like a gradient effect:
 
 ![Image](../../images/interpolation.PNG)
 
@@ -79,23 +68,24 @@ The color values are extracted at the pixel centers:
 
 ![Image](../../images/pixel_centers.PNG)
 
-*Aliasing* is the visual stair-stepping of edges that occurs in the image. It is the result when you hide the original represetation with a lower representation (too many to be captured on the pixels) or when pixels are partially covered.
+# Aliasing
+**Aliasing** is the visual stair-stepping of edges that occurs in the image. It is the result when you hide the original represetation with a lower representation (too many to be captured on the pixels) or when pixels are partially covered.
 
-This can be solved with *anti-aliasing* which is smoothing the jagged edges. One way is *super sampling*: render at higher resolution then reduce resolution by averaging the colors of the neighboring pixels. Results in lower resolution but smoother images:
+This can be solved with ***anti-aliasing*** which is smoothing the jagged edges. One way is **super sampling**: render at higher resolution then reduce resolution by averaging the colors of the neighboring pixels. Results in lower resolution but smoother images:
 
 ![Image](../../images/super_sampling.PNG)
 
-The *super sampling* can choose a filter to do the averaging, with a popular one being the *box filter* as mentioned in week 1.
+The **super sampling** can choose a filter to do the averaging, with a popular one being the **box filter** as mentioned in week 1.
 
-## Shading (light reflection)
-In order to make 2D images look 3D, we have to apply *shading* or light reflection. We can use the *gonioreflectometer* to get all the precise light reflection data but it is often costly. So instead we mostly use mathematical models. It has the following properties:
+# Shading (light reflection)
+In order to make 2D images look 3D, we have to apply **shading** or light reflection. We can use the *gonioreflectometer* to get all the precise light reflection data but it is often costly. So instead we mostly use mathematical models. It has the following properties:
 
 - describes light interaction as a function
 - more lightweight than the database from the instrument
 - parameters to control appearance
 - acquired materials can be approximated
 
-One of the most popular mathematical model is the *Phong model*:
+One of the most popular mathematical model is the **Phong model**:
 
 ![Image](../../images/phong_model.PNG)
 
@@ -111,7 +101,7 @@ The phong model has three properties/fucntions:
 
 The variables represent the color properties in RGB, thus a tuple with 3 floats in range [0, 1].
 
-### Phong model: Ambient
+## Phong model: Ambient
 The *ambient* mimics the *scene light* which is reflections from neighboring surfaces. It is used to account for the small amount of light that is scattered about the entire scene. 
 
 ![Image](../../images/ambient.PNG)
@@ -128,7 +118,7 @@ The ambient term doesn't actually indicate the shape of the object as it only ap
 
 ![Image](../../images/ambient_in_practice.PNG)
 
-### Phong model: Diffuse
+## Phong model: Diffuse
 The *diffuse* property is the reflected light intensity from a surface such that the light scatters in many different angles rather than just one same angle. This tends to be the case when light is reflected off of rough surfaces like clothing, paper and asphalt. 
 
 ![Image](../../images/specular_diffuse.PNG)
@@ -153,7 +143,7 @@ Careful: the light should always come from above
 the surface, otherwise, it should stay black.
 What does this mean for the angle 
 
-### Phong model: Specular
+## Phong model: Specular
 The *specular* property is the reflected light intensity from a surface such that the light scatters in all the same angle (unlike diffuse). This tends to be the case when light is reflected off of smooth or glossy surfaces like a mirror. This results in that specific area being much more luminous than the rest:
 
 ![Image](../../images/specular_reallife.PNG)
@@ -168,19 +158,23 @@ As the specular reflection coefficient (Ks) increases, the glossy reflected ligh
 
 ![Image](../../images/specualr_chart.PNG)
 
-### Phong model: Optional
+## Phong model: Optional
 There is one more extra property called *emission*. This equivalent to ambient with light set to 1. This is used when the object emits light like hot glowing metal.
 
+
+## Phong formula
 The final result of combing all ambient, diffuse, and specular:
 
-![Image](../../images/final_result.PNG)
+![Image](../../images/phong_equation.PNG)
 
-### Shading techniques
+Remember that for diffuse and specular, you have to get the sum of each light value present, not just one. For ambient it is all uniform so doesn't matter.
+
+## Shading techniques
 There are several shading techniques that makes use of the phong model:
 
-- *Flat shading*: applies *phong model* to produce color per face 
-- *Gouraud shading*: applies *phong model* to produce color per vertex, interpolate color from vertices over triangle
-- *Phong shading*: applies *phong model* to produce color per pixel, interpolate parameters of *phong model*
+- **Flat shading**: applies *phong model* to produce color per face 
+- **Gouraud shading**: applies *phong model* to produce color per vertex, interpolate color from vertices over triangle
+- **Phong shading**: applies *phong model* to produce color per pixel, interpolate parameters of *phong model*
 
 Phong shading is one the most used techniques as it computes the color result per pixel. This is done by interpolating the normals (not color) of vertices over pixels:
 
@@ -189,35 +183,6 @@ Phong shading is one the most used techniques as it computes the color result pe
 The result is an image with much smooth sepcularities:
 
 ![Image](../../images/phong.PNG)
-
-
-
-## Vectors and Shading
-Remember that vector is not the same as position. Position is a point on a space. A vector is a direction from point A to point B. Just because they are both in the form of glm::vec3 in C++ does NOT mean same thing.
-
-To get a vector going in the direction of point A:
-```
-point.A - point.B
-```
-
-If we did point.B - point.A, it is going in the direction of point B
-
-When we calculate the dot product of two products, we are calculating their cosO, with O being the angle. Lets say we have a normal vector from a surface point and a light vector. In order to make sure that the light is only reflected ABOVE the surface and NOT BENEATH the surface:
-
-```
-    if (glm::dot(normal, lightVector) < 0.0)
-        return { 0.0, 0.0, 0.0 }; 
-```
-
-This is because if the angle between normal vector and a vector is between 90 ~ 270 degrees (beneath the surface), cosO is [-1, 0]. Therefore, any dot product that is less than 0.0 can be dark.
-
-
-For the shading assignment, the light, reflection, half-way, view (camera) vector ALL have to me normalized.
-(L, R, H, V)
-
-cross product of two vectors returns a new vector that is perpendicular to both vectors. But keep in mind that this result in a vector, which starts in the origin (0, 0, 0). If you wanted to use this result vector to get to a point, the selected position must be added to the vector (thing of it as 'new' origin). In addition, make sure the vector you use in cross product is in right direction.
-
-The result of every 
 
 
 ## OpenGL tutorial

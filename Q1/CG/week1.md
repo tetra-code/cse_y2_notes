@@ -1,20 +1,17 @@
-# Week 1
+# Image
 3D models are typically triangles. 
-
 *Projection*: Transforming coordinates to 2D screen
+*Rasterization*: Filling screen pixel
 
-*Rasterization*: Filling screen pixe
-
-## Image
 When specifying image size, we define it as **width * height**
 
-### Pixels
+# Pixels
 A image is basically many pixels with different colors combined. Each pixel color can be represented by 3 color components: 
 - Red
 - Green
 - Blue
 
-### Pixels index
+## Pixels index
 Each value is between 0 ~ 1, typically a continuous value. In practice, they must be discretized, so we assign 8 bit per color component. This gives us 256 available values per color component and 256^3 total combinations. 
 
 The formula for this conversion: **min(v * 255, 255)**
@@ -43,7 +40,7 @@ Ex) For a RGB image with resolution (8 * 5), with 8 being the width, the pixel (
 
 ![image](../../images/rgb_index.PNG)
 
-### Pixels reverse index
+## Pixels reverse index
 If we want to find a pixel(i, j) given index I for a grayscale image:
 
 **i = I % width** - full rows that fit into I
@@ -51,13 +48,11 @@ If we want to find a pixel(i, j) given index I for a grayscale image:
 
 *note that j is an integer division thus 5/3 = 1, not 1.666666666
 
-## Filter
-Filter basically applies some computation on each pixel and for each color channel on the pixel. 
+# Filter
+Filter basically applies some computation on each pixel and for each color channel on the pixel. In bright values, hard to detect small changes. In darker values, our eyes are better at detecting. 
 
-These filters are very simple but powerful. In bright values, hard to detect small changes. In darker values, our eyes are better at detecting. 
-
-### Box Filter
-*Box filter* is literally just a box filter, where we have a center pixel and a box filter that defines how many pixels. It then averages out the pixel value and apply it to the center pixel:
+## Box Filter
+**Box filter** is literally just a box filter, where we have a center pixel and a box filter that defines how many pixels. It then averages out the pixel value and apply it to the center pixel:
 
 ![image](../../images/box_filter.PNG)
 
@@ -78,7 +73,7 @@ Notes:
 - i and j are pixel positions so we do want them to be integers, but for the sum we want them to be float because.
 - In the box filter code, we first make a copy of the image and then store the pixel result in the copied image, to prevent averaging what you already averaged.
 
-### Boom filter
+## Boom filter
 1. Copy the original image
 2. Threshold the image (only keep large color values like > 0.9). 
 -> instead of immediately dropping down any below threshold value to 0, have a function that makes this transtion smoother.
@@ -88,32 +83,32 @@ Notes:
 
 The square box from the boxfilter may be visilbe on the result. You can also have a generla filter. THe sum of the values in the filter image should always be 1, to maintain brightness level.
 
-Simply put, Machine learning is a successive filtering and thresholding process, where filtered pixel entires are optimized during training:
+Simply put, machine learning is a successive filtering and thresholding process, where filtered pixel entires are optimized during training:
 
 ![image](../../images/ml_filtering.PNG)
 
-## Storing
+# Storing image
 There are several formats for images. Two major categories:
 - Lossy, complex, small space - JPEG
 - Lossless, simple, large space - PPM
 
-### PPM
+## PPM
 PPM image is lossless, simple, and takes up large space. It consists of a header and image data (body). Header specifies all meta data. The header contains
 
-- *magic number* - e.g. P3: for human-readable (the big array part) pixel values in RGB format
-- Image width <Whitespace> Image hieght <Whitespace>
-- Maximum color value between [0, 65535] (more precise than 8 bit)
+- *magic number* - e.g. P3: for human-readable pixel values in RGB format
+- width <Whitespace> height <Whitespace>
+- max color value between [0, 65535] (more precise than 8 bit)
 
-IN the example, you will see that 15 is the hightest number in any pixel. Thus max color value is 15.
+In the example, you will see that 15 is the hightest number in any pixel. Thus max color value is 15.
 
 ![Image](../../images/ppm.PNG)
 
-PPM is simple but inefficient in terms of storage. Size directly relates to
+PPM is simple but inefficient in terms of storage. Size directly relates to:
 - bytes per color channel (if not human-readable)
 - resolution
 
-### JPEG
-JPEG is much more complicated than PPM. Compression is achieved by reducing the quality (lossy). Regardless, a compression ratio of 1:10 still results in high quality images. Basically, it uses *frequencey decomposition* by removing high frequency waves first to compress. High frequency means the period is shorter, not a bigger difference from top to bottom. 
+## JPEG
+JPEG is much more complicated than PPM. Compression is achieved by reducing the quality (lossy). Regardless, a compression ratio of 1:10 still results in high quality images. Basically, it uses **frequencey decomposition** by removing high frequency waves first to compress. High frequency means the period is shorter, not a bigger difference from top to bottom. 
 
 ![Image](../../images/frequency_wave.jpg)
 
@@ -125,7 +120,7 @@ To determine how to get the combination of colors in the pixel group, we have to
 
 ![Image](../../images/apply_cosine_wave.PNG)
 
-We start off with a low frequency cosine wave and gradually add more cosine waves with higher frequency. This will later converge into a *Fourier series*:
+We start off with a low frequency cosine wave and gradually add more cosine waves with higher frequency. This will later converge into a *fourier series*:
 
 ![Image](../../images/fourier_series.png)
 
@@ -143,7 +138,7 @@ For each of the functions in the image, functions that change very little will h
 
 When working with JPEG images, takes up more space in RAM than compared to space in a hard disk.
 
-## Linking algebra with GPU
+# Linking algebra with GPU
 In a GPU, things are projected in 3D. But a GPU's job is also to project a 3D model onto a 2D screen:
 
 ![Image](../../images/3d_to_2d.PNG)
@@ -190,6 +185,6 @@ Naive operation to project a scene point with the camera:
 2. Apply rotation (matrix mul)
 3. Apply projection (non linear scaling)
 
-This can become complicated. A better way is to unify translation, rotation and projection with a matrix multiplication. But because translations and projections are not linear we can't use matrixes with mere 2D values. Instead use *homogenous coordinates* from projective geometry. Homogenous coordinates are 3-vector that can represent 2D coordinates 
+This can become complicated. A better way is to unify translation, rotation and projection with a matrix multiplication. But because translations and projections are not linear we can't use matrixes with mere 2D values. Instead use **homogenous coordinates** from projective geometry. **Homogenous coordinates** are 3-vector that can represent 2D coordinates.
 
-A camera projection is a matri and combining matrices allows us to define *hierarchical-object dependencies*.
+A camera projection is a matrix and combining matrices allows us to define **hierarchical-object dependencies**.
