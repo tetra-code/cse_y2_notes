@@ -43,7 +43,7 @@ Result of final pipeline:
 
 ![Image](../../images/final_pipeline.PNG)
 
-The above multiplied together gets us a single 4 x 4 camera matrix.
+The above multiplied together gets us a single 4 x 4 camera matrix. To find out what the symbols in the projection and viewport matrix means, checkout the OpenGL section at the end of this note.
 
 # Triangle clipping
 The above works well for individual points but fails for triangles. For parts of a triangle that are ouside of the frustum, we need to clip the crossing part. Everything inside the frustum is taken care of.
@@ -214,3 +214,12 @@ focal length (f) has inverse relation with field of view (fov). As focal length 
 As the field of view or angle (Fovy) becomes smaller, our focus becomes narrow thus the object seems bigger. As the angle become bigger, our focus becomes wider thus object seems smaller
 
 THe wider the camera, the shorter the *focal lens* (field of view or FOV)
+
+
+From the projection matrix, near and far are both absolute z values of near plane and far plane. Whereas 'f' stands  for near/top, with top being the height/2 of near plane. Here 'aspect' = width/height of near plane. More simplified version:
+
+![Image](../../images/projection_matrix.PNG)
+
+From the viewport matrix, Kx is the coefficient *w* or width of the viewport and Ky is the coefficeint *h* or height of the viewport. Xlb is starting x value of viewport and Ylb is starting y value of the viewport. You can see what you have to do to get Xndc, Yndc, and Zndc:
+
+![Image](../../images/opengl_transformation.PNG)
