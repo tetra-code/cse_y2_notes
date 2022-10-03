@@ -249,6 +249,10 @@ Not that our point is on our *image plane*, we now have to calculate how large t
 
 ![Image](../../images/image_plane.PNG)
 
+The above f stands for *focal length* and it is the distance from the camera to the projection plane. The projection plane is almost always placed at a distance from the camera such that the distance from the *projection plane's center to the projection plane's top and bottom is 1*. This image from this website shows it well: 
+
+![Image](../../images/focal_length.PNG)
+
 *Viewport* is simply mapping our projection onto pixels for dispasly. We take the image plane and transform it into a [0 * width - 1] * [0 * height - 1] matrix called a *viewport*:
 
 ![Image](../../images/viewport.PNG)

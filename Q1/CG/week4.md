@@ -1,6 +1,4 @@
-# Week 4
-
-## Interpolation on a trinagle
+# Interpolation on a trinagle
 To interpolate on a triangle, one should describe point P on the triangle as a combination of the three vertices that make up the triangle. For the three vertices A, B, C and coefficients x, y, z:
 
 P = xA + yB + zC, with x + y + z = 1 & x,y,z>0
@@ -15,7 +13,7 @@ Interpolation is used for rasterization. But if the triangle doesn't cover the c
 
 ![Image](../../images/great_tv.PNG)
 
-## Texture mapping
+# Texture mapping
 Texture mapping is applying a 2D image on to a 3D geometric shape to add more details to the object. As mentioned before, an object in CG consists of numerous triangles. If we combine *texels* (texture pixels) with the wireframe of triangels, we get a texture mapped triangles:
 
 ![Image](../../images/textures.PNG)
@@ -25,7 +23,7 @@ We speciify a *texture coordinate* at each vertex. In order to define these text
 - *mesh unwrapping*: load the mesh onto a 2D box to determine coordinates
 - *geometric texture mapping*: define a function that takes a vertex position (x, y, z) in R3 and map onto 2D texture coordinates (u, v) = T(x, y, z)
 
-### Mesh unwrapping
+## Mesh unwrapping
 For *mesh unwrapping* there are special softwares that flattens the mesh for us:
 
 ![Image](../../images/mesh_unwrapping.PNG)
@@ -36,6 +34,10 @@ After defining the texture coordinate, we then use interpolation on to the cente
 
 ![Image](../../images/texel_value.PNG)
 
+The camera view will render this shape of the texture:
+
+![Image](../../images/comparison.PNG)
+
 Outside the texture, there are different modes per axis:
 
 - *Border*: constant color
@@ -44,7 +46,7 @@ Outside the texture, there are different modes per axis:
 
 ![Image](../../images/outside_texture.PNG)
 
-### Geometric Texture Mapping
+## Geometric Texture Mapping
 Depending on how we define the function the result texture can vary. The function can be defined so that coordinate would be:
 
 - T(x,y,z) = (x,y)
@@ -64,7 +66,7 @@ You can apply the same concept to YZ and ZX:
 
 But our functions can be mroe complicated than the above.
 
-#### Cylinder
+### Cylinder
 Let position (x,y,z) = (r*cos(t), r*sin(t), z) for suitable r,t,z
 
 ![Image](../../images/cylinder.PNG)
@@ -77,7 +79,7 @@ Others:
 
 ![Image](../../images/cylinder_others.PNG)
 
-#### Sphere
+### Sphere
 To do a sphere
 Let position (x,y,z) = (r*cos(t)sin(s), r*sin(t)sin(s), r*cos(s)) for suitable r,t in [0,2pi) and s in [0,pi]. IF r is constant, points are on a sphere.
 
@@ -85,12 +87,12 @@ Then T( (r*cos(t)sin(s), r*sin(t)sin(s), r*cos(s)) ) = (t/2pi, s/pi)
 
 ![Image](../../images/sphere.PNG)
 
-#### Cube map
+### Cube map
 Texture (depends on the cube side) and coordinate
 
 ![Image](../../images/cube_map.PNG)
 
-### Affine texture mapping vs Perspective texture mapping
+## Affine texture mapping vs Perspective texture mapping
 The above interpolation techinque is called *affine interpolation*: we simply calculate the result as if it is on a screen-space (2D) thus no depth perception. 
 
 But if we were to use this technique on an object that is distorted due to depth, this is actually what we will be calculating:
@@ -107,7 +109,7 @@ Thus this is the result of affine interpolation on a depth distorted object:
 
 Affine texture mapping doesn't take Z-value into account and thus step uniformly over the texture. Nowadays, *perspective texture mapping* has become the norm due to enhanced hardware and industry standards.
 
-### Texture Aliasing
+# Texture Aliasing
 As mentioned before, *pixel* is the unit of a screen space whiel a *texel* is the unit of a texture space. *Texture mapping* is mapping the texels to appropriate pixels in the output picture. We ideally want a one-to-one mapping between pixels and texture
 
 ![Image](../../images/texel_to_pixel.PNG)
@@ -117,7 +119,7 @@ As mentioned before, *pixel* is the unit of a screen space whiel a *texel* is th
 - oversampling texture maps: more pixels on the screen than texels on the texture
 - undersampling texture maps: less pixels on the screen than texels on the texture
 
-### Oversampling
+## Oversampling
 This occurs when more pixels map to a single texel. This results in a *nearest neighbor*:
 
 ![Image](../../images/nearest_neighbor.PNG)
@@ -133,7 +135,7 @@ To solve this jagged edges appearance, we apply interpolation:
 The below calculation shows the yellow value having the highest coefficient (1-a > a && 1-b > b)
 ![Image](../../images/bilinear_calculation.PNG)
 
-### Undersampling
+## Undersampling
 This occurs when some pixels are too compressed with more texels:
 ![Image](../../images/undersampling.PNG)
 
@@ -148,7 +150,7 @@ To solve this, two options:
 
 - before the actual mapping, average the values of the texels and look up the result: mipmapping
 
-#### Mipmapping
+### Mipmapping
 *Mipmapping* is calculating series of optimized sequences of filtered textures, each of which is progressively lower resolution representation than the previous. Then depending on the pixel-to-texel mapping, we choose the correct level of the mipmap.
 
 ![Image](../../images/mipmapping.PNG)
@@ -173,5 +175,167 @@ Between these different mipmap levels, we can also apply interpolation called *t
 
 ![Image](../../images/interpoalte_mipmap.PNG)
 
-## Textures: Light maps
-Render an image and store it as a textures
+# Advanced textures
+
+## Light maps
+Instead of computing the lighting at the spot, precompute the lighting. These are called *light maps* and combine these:
+
+![Image](../../images/light_map_1.PNG)
+
+![Image](../../images/light_map_2.PNG)
+
+
+## Texture lookup
+Texture data can represent mroe than just colors of an image, it also stores values associated to a domain (domain accessed via texture coordinates). There are different domain dimensions and GPUs can natively support 1D, 2D, and 3D. In 1D texture, everything is defined as a function.
+
+![Image](../../images/domain_representation.PNG)
+
+Sometimes the computations required to get the texture value can be complex. So instead of computating all the values, we approximate them via *texture lookups*. Instead of computing the exact value of the function every time, we compute once and store it as a lookup array to be used again in the future. 
+
+![Image](../../images/texture_lookup.PNG)
+
+In addition to speed, another advantage is to filter a texture using *linear texture interpolation*. This allows us to get a continuous result via linear approximation and doesn't cost much.
+
+![Image](../../images/texture_interpolation.PNG)
+
+In a 2D texture, the lookup also allow us to consider depths in the object:
+
+![Image](../../images/2D_lookup.PNG)
+
+To represent a volume, 3D texture is required and the texels represent volumes (volume pixels). To render volumes, we use *slicing*:
+
+![Image](../../images/slicing.PNG)
+
+## Standard Alpha Blending
+We used to describe pixel colors with RGB, thus 3 channels. There can be a fourth channel known as the *alpha value*. The alpha value describes the trasparency effect. If it's fully opaque, object is solid (no transparency). If it's fully transparent, object is completely see through. Here are the corresponding alpha values:
+
+![Image](../../images/alpha_values.PNG)
+
+If the current pixel color is (r, g, b) and there is an incoming fragment (R, G, B, A), we have to consider the alpha value A. The new pixel color is:
+
+![Image](../../images/opacity_formula.PNG)
+
+Lets say we have two triangles A, B and both have alpha values. We draw A first, thus only A's alpha value is reflected on the triangle. Then we draw B and parts of it overlaps A. For the overlapping part, we follow the above formula and apply B's alpha value on A's preexisting parts: 
+
+![Image](../../images/triangles.PNG)
+
+The order of the drawn object is important. Above we drew B first thus B's alpha value is dominant on the overlapping part. If we drew B first and A last, then A's alpha value will override B's alpha value:
+
+![Image](../../images/A_drawn_last.PNG)
+
+If A = 0, texel is considered transparent and not drawn
+If A = 1, texl is drawn
+
+## Environment mapping
+Textures can encode an environment. This is called *environment mapping* and is useful for reflections of the environment. This requires a *cube map*, which represents on a cube all the values of light that you see around it.
+
+![Image](../../images/cube_mapping.PNG)
+
+Normally we have a point on our object and a center and check if the point is projected onto the cube from the center. This tells us the texture and coordinate:
+
+![Image](../../images/texture_coordinate.PNG)
+
+To do environment mapping, we take a reflection from the viewpoint to the object and calculate where that ends up on the cube:
+
+![Image](../../images/cube_map_reflection.PNG)
+
+The lookup from this *cube map computating is based only on the reflection (ray) direction*. Thus *in a cube map same direction equals same lookup*, even if the location is different.
+
+Below the left reflection should lead to the ball and the right reflection shouldn't. But in a cube map, both have the same direction thus will show the ball to both, even though it shouldn't in real life.
+
+![Image](../../images/what_it_should.PNG)
+
+In environment mapping we assume the enviroment is infinitely far away, thus the distances of the reflection location is not computed correctly.
+
+## Dynamic textures
+*Dynamic texture* goes one step beyond regular cube mapping and updates the cube map from time to time. This requires *multiple render passsing*: where instead of one image rendering, render multiple images by iteratively taking output of one image render and feeding it as input to another image rendering process. 
+
+![Image](../../images/multi_render.PNG)
+
+This technique is also used in *simultaneous multi-projection* to render multiple outputs at once and create multiple projection planes:
+
+![Image](../../images/smp.PNG)
+
+# Shadows
+A *shadow* is a region of space where at least one point of the light source is occluded. There are three distinct parts of a shadow:
+
+- *umbra*: completely dark region
+- *penumbra*: partially faded region
+- *antumbra*: paritally faded region that forms at a certain distance from the object casting the shadow
+
+![Image](../../images/shadow.PNG)
+
+In computer graphics, we want to color specific places around the object to give the illusion that the object is creating a shadow. How detailed the shadow should be depends. If it is a simple game then the shadow may be simplified to save computing time and resources. If it is in a high budget animated film, then realistic shadows are required.
+
+![Image](../../images/realistic_shadow.PNG)
+
+When creating shadows we can choose for either:
+
+- *hard shadows*: point lights don't create penumbra
+- *soft shadows*: point lights create penumbra
+
+![Image](../../images/hard_soft_shadow.PNG)
+
+## Point light source shadow
+To compute the shadow, we borrow the phong model where we used to calcualte how much light reflection is perceived by the camera(viewer):
+
+![Image](../../images/phong_model_recap.PNG)
+
+Now we palce an object in the middle of the light vector and if the object blocks the pathway between L and P, then we reflect a shadow (not a light) to the camera. Symbols for the formula:
+
+- E(L): energy of the light
+- v(P, L): visibility test (whether light is visible or not due to object)
+- Transfer(P, L): calculation of reflection vector
+
+Thus if there is no light, v(P, L) is 0 => B(P) equals 0 => viewer sees shadow.
+
+![Image](../../images/shadow_formula.PNG)
+
+## Area light source shadow
+If we do this only for point light sources, we don't get the penumbrae (faded region) as there is only one point on the light source thus it's either visible (1) or not(0), no partial value available. To get the penumbrae, we need an area light source:
+
+![Image](../../images/area_light_source_shadow.PNG)
+
+This is very costly to compute in real. Prior to 2008 all real-time shadow algorithms only computed the approximate shadow:
+
+![Image](../../images/approximation_equation.PNG)
+
+A worse approach is for each pixel, checking if it can see each point of the area light source and compute the result.
+
+### Shadow mapping
+A good solution to the above approach is *shadow mapping*. We used to consider whether each point on the scene can see the light source. Shadow mapping does it backwards and consider whether the light source see the point on the scene. Everything seen from light's perspective is lit and everything else is in a shadow. 
+
+![Image](../../images/light_see_point.PNG)
+
+It goes like this:
+
+1. Render an image view (using *depth buffer*) from light source
+2. Store above depth value results in texture (*depth map*)
+3. Render 3D environment from viewpoint
+4. Take each drawn pixel and its corresponding 3D position (depth)
+5. Compare the depth from the *depth map* and depth in the light view
+6. If depth values are the same, pixel is lit. Otherwise pixel is in shadow
+
+We use depth buffer instead of color buffer since color buffer doesn't tell anything about the depths of a pixel.
+
+As shown below, the green dot from the light image view has same depth value as the green dot from the viewpoint. The red dot from the viewpoint doesn't have same depth value.
+
+![Image](../../images/light_see_point.PNG)
+
+#### Shadow mapping problems
+Several problems when it comes to shadow mapping
+
+As mentioned before, texel-to-pixel mapping may not be one to one. High resolution is required for good shadow generation from shadow mapping. As shown below, not enough texels to represent the image resulting in edge cases:
+
+![Image](../../images/edge_cases.PNG)
+
+Another problem is *depth bias* which occurs from self-shadowing. 
+
+![Image](../../images/depth_bias.PNG)
+
+![Image](../../images/depth_bias_result.PNG)
+
+Solution is to add an offset to shift all the depth values that corresponds to our texture a little back:
+
+![Image](../../images/shifted_offset.PNG)
+
