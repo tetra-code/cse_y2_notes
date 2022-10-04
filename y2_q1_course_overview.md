@@ -40,7 +40,7 @@ The final project is done in groups but students can receive individual grades b
 The endterm exam will be physical. There are multiple-choice and potentially open-ended questions. A simple calculator without programming capabilities is permitted. All exams will have similar *types* of questions but never the same questions.
 
 ### Assessment
-The practical grade is given as: P=0.4*A + 0.6*F and mathematically rounded in .1 steps.
+The practical grade is given as: P = 0.4 * A + 0.6 * F and mathematically rounded in .1 steps.
 The exam grade is given as 100% from the physical exam.
 The final grade is 50% from the exam grade and 50% from the practical grade. 
 
