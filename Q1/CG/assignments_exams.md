@@ -89,7 +89,7 @@ point.A - point.B
 
 If we did point.B - point.A, it is going in the direction of point B
 
-When we calculate the dot product of two products, we are calculating their cosO, with O being the angle. Lets say we have a normal vector from a surface point and a light vector. In order to make sure that the light is only reflected ABOVE the surface and NOT BENEATH the surface:
+When we calculate the dot product of two vectors, we are calculating their cosO, with O being the angle. Lets say we have a normal vector from a surface point and a light vector. In order to make sure that the light is only reflected ABOVE the surface and NOT BENEATH the surface:
 
 ```
     if (glm::dot(normal, lightVector) < 0.0)
@@ -143,3 +143,15 @@ from the origin.
 - For last question in shadows, it is the shadow map and thus you apply the scale and filter and then compute the coordinate values
 
 - Remember that for diffuse and specular, you have to get the sum of each light value present, not just one. For ambient it is all uniform so doesn't matter.
+
+- to achieve the **model view matrix** of showing the rotation and translation values on one matrix, FIRST ROTATAION SECOND TRANSLATION
+
+- If the *camera was tilted slightly downards the third vanishing point would appear at the top* of the image.
+
+- When they give you a point, make sure whether you need a find a VECTOR or just use that point
+
+![Image](../../images/get_vector.PNG)
+
+- For image plane length calcualtion, remember some useful formulas. For example 
+
+sin(2x) = 2 * cos(x) * sin(x)

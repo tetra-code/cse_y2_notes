@@ -153,8 +153,9 @@ You can move the central point along the horizontal line to the opposite side an
 
 ![Image](../../images/two_point_perspective.PNG)
 
+Only two points are needed if the vertical lines are parallel on the image. There is a *third* vanishing point; if the camera is looking straight at the center it is projected to infinity. If the *camera was tilted slightly downards the third vanishing point would appear at the top* of the image.
 
-In *projective geometry* everyting is lienar using homongeous equations.
+To determine the locations of the vanishing points, take the directions of the sides of the building in 3D (with w = 0) and project using the projection matrix.
 
 ## Virtual Camera model
 Given a 3D point, find a function that results in the points projecting on to a 2D image. As the camera moves or the object moves, the image will be the same. On the graphics card, the 3D object is always the same, we just change our perspective on the 2D screen. 

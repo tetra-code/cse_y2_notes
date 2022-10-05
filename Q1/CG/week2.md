@@ -71,7 +71,7 @@ To get a location in infinity space:
 - Rotate around origin
 - Translate back to Q
 
-As shown below, we can combine rotation and translation operation into one: 
+As shown below, we can combine rotation and translation operation into one. The following combination only works IFF we apply rotation first, and then translations: 
 
 ![Image](../../images/homogenous_transformation.PNG)
 
