@@ -139,18 +139,19 @@ gray + white = white
 
 - If the *camera was tilted slightly downards the third vanishing point would appear at the top* of the image.
 
-
-![Image](../../images/get_vector.PNG)
-
 - For image plane length calcualtion, remember some useful formulas. For example 
 
 sin(2x) = 2 * cos(x) * sin(x)
 
 or 
 
-- remember reflectance vector formula:
+use the y / x to get a 'linear equation' like expression and find the variable values
 
-r = d - 2(d*n)n where d is light vector going 'in' (surface - light), n is the normal vector
+- remember reflection vector formula:
+
+**r = d - 2(d*n)n **
+
+where d is light vector going 'in' (surface - light), n is the normal vector
 and normalized. d is NOT normalized
 
 - When they give you a point, make sure whether you need a find a VECTOR or just use that point. If it is vector, then think about the vector direction. For example, *light - surface* will give you vector in the light direciton. *surface - light* will give you in the surface direction. Remeber 'first come first served' 
