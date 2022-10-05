@@ -1,6 +1,5 @@
 # Assignment
-
-### Robot arm
+## Robot arm
 After the cube, when we want to apply an operation to its whole, the operation should be applied at the very last thus after it is finished creating parts for cube. This is to ensure the entire cube is affected by the operation in the end.
 
 When drawing a segment that is influenced by a previous one, operations are involved that take part from the previous segment in order to be influenced by the previous segment's movement as well.
@@ -49,7 +48,7 @@ The below image depicts that after finishing applying segment2's rotation, we ap
 
 ![Image](../../images/robot_arm.PNG)
 
-### Solar System
+## Solar System
 Solar system assignment is similar but has one more condition: orbiting and spinning are two separate operations that should not impact each other in any way.
 
 If the moon has an orbit speed of zero, then it would always stay on the same side of the planet as seen from a static point in space:
@@ -108,21 +107,14 @@ The result of every
 
 # Exam tips
 
-- must bring object to origin first in order to rotate around another object and then translate again. 
-For points q,p and p rotatates around q, we must make p 'in-position' to rotate around the origin. 
-Thus translate p by negative q coordinate. This will make the p 'in-position' to rotate around the origin which can be seens as 
-rotating around the q, just in different location. If we don't do this it will NOT rotate as a circle
-around the origin.
-
-- Order always on the right for first operation. direction of the multiplication doesn't 
-affect the result, ONLY THE ORDERING OF THE TRANSFORMATIONS. When in doubt always assume we are applying one by one thus right to left direction.
+- must bring object to origin first in order to rotate around another object and then translate again. For points q,p and p rotatates around q, we must make p 'in-position' to rotate around the origin. Thus translate p by negative q coordinate. This will make the p 'in-position' to rotate around the origin which can be seens as rotating around the q, just in different location. If we don't do this it will NOT rotate as a circle around the origin.
 
 - question for bike, the absoute value angle part is to consider that bike will move 1 unit forward
 when pedaled full 360 degrees. iT IS absolute since we are pedal goes clockwise.
 
-- focal length, is when the projection plane's center to top distance is one and projection 
-plane's center to bottom distance is also one. To find focal length, find the projection plane coordinate such 
-that the length from its center to top is 1 and center to bottom is also 1
+- Order always on the right for first operation. direction of the multiplication doesn't affect the result, ONLY THE ORDERING OF THE TRANSFORMATIONS. When in doubt always assume we are applying one by one thus right to left direction.
+
+- focal length, is when the image (projection) plane's center to top distance is one and projection plane's center to bottom distance is also one. To find focal length, find the projection plane coordinate such that the length from its center to top is 1 and center to bottom is also 1
 
 - Remember that black pixel + white pixel does NOT equal gray. as 0.0 + 1.0 = 1.0. Same for gray: black pixel + gray pixel =
 
@@ -131,16 +123,13 @@ black + black = black
 black + gray = gray
 gray + white = white
 
-- To check if any point is inside triangle, make it into a linear (matrix multiplication) form
-and do the gaussian elimination
+- To check if any point is inside triangle, make it into a linear (matrix multiplication) form and do the gaussian elimination
 
-- To see if a point lies on a line (A, B) of the triangle, create the  'interpolation' form
-and the triangle point that does NOT make the line, it's coefficient is 0 (not 1)
+- To see if a point lies on a line (A, B) of the triangle, create the  'interpolation' form and the triangle point that does NOT make the line, it's coefficient is 0 (not 1). For triangle interpolation, coefficients a + b + c = 1 and a, b, c > 0. If not 
 
-- Scaling an object that is centered at the origin produces a different result than scaling an object that has been moved away 
-from the origin. 
+- Scaling an object that is centered at the origin produces a different result than scaling an object that has been moved away from the origin. 
 
-- For last question in shadows, it is the shadow map and thus you apply the scale and filter and then compute the coordinate values
+- For last question in shadows they say the light should be reflected with 2/3 of the original light value. This means that 1/3 pixels inside the filter are equal or below the specified depth value (0.3). Find the values that does this
 
 - Remember that for diffuse and specular, you have to get the sum of each light value present, not just one. For ambient it is all uniform so doesn't matter.
 
@@ -150,10 +139,21 @@ from the origin.
 
 - If the *camera was tilted slightly downards the third vanishing point would appear at the top* of the image.
 
-- When they give you a point, make sure whether you need a find a VECTOR or just use that point
 
 ![Image](../../images/get_vector.PNG)
 
 - For image plane length calcualtion, remember some useful formulas. For example 
 
 sin(2x) = 2 * cos(x) * sin(x)
+
+or 
+
+- remember reflectance vector formula:
+
+r = d - 2(d*n)n where d is light vector going 'in' (surface - light), n is the normal vector
+and normalized. d is NOT normalized
+
+- When they give you a point, make sure whether you need a find a VECTOR or just use that point. If it is vector, then think about the vector direction. For example, *light - surface* will give you vector in the light direciton. *surface - light* will give you in the surface direction. Remeber 'first come first served' 
+
+- For reflection light vector problem, the reason we normalize and find the 'would-be' vector is because we want to find the position of the new normal. By normalizing, we ensure the distances are both 1 and by adding the light vector and reflection vector we ensure that we stay in the middle of the two but just different 'height', thus a normal vector. But the light vector has to to be pointing 'out' (light - surface). Otherwise calculation is wrong
+
