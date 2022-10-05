@@ -137,7 +137,7 @@ gray + white = white
 
 - to achieve the **model view matrix** of showing the rotation and translation values on one matrix, FIRST ROTATAION SECOND TRANSLATION
 
-- If the *camera was tilted slightly downards the third vanishing point would appear at the top* of the image.
+- If the *camera was tilted slightly upwards the third vanishing point would appear at the top* of the image.
 
 - For image plane length calcualtion, remember some useful formulas. For example 
 
@@ -158,3 +158,28 @@ and normalized. d is NOT normalized
 
 - For reflection light vector problem, the reason we normalize and find the 'would-be' vector is because we want to find the position of the new normal. By normalizing, we ensure the distances are both 1 and by adding the light vector and reflection vector we ensure that we stay in the middle of the two but just different 'height', thus a normal vector. But the light vector has to to be pointing 'out' (light - surface). Otherwise calculation is wrong
 
+- Learn the different texture options.
+
+texture interpolation types:
+- **linear interpolation**
+- **bilinear interpolation**
+- **trilinear interpolation**
+
+outside the texure (border behavior)
+- **border**: constant color
+- **clamp**: keep border texel value
+- **repeat**: at borders
+
+![Image](../../images/clamp_vs_repeat.PNG)
+
+For below whether the use clamping or repeating vertically doesn't matter anymore here, since we've stretched out the texture anyway. 
+
+![Image](../../images/coordinates_not_always_seem.PNG)
+
+- When we say 2 x 1 image, it is width 2 and height 1. 
+
+![Image](../../images/2by1_texture.PNG)
+
+If we say 2 x 1 matrix, it is a height of 2 and width of 1.
+
+![Image](../../images/2by1_matrix.PNG)

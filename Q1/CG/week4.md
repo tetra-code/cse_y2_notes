@@ -45,11 +45,13 @@ The camera view will render this texture shape:
 
 Outside the texture, there are different modes per axis:
 
-- **Border**: constant color
-- **Clamp**: keep border texel value
+- **border**: constant color
+- **clamp**: keep border texel value
 - **repeat**: at borders
 
 ![Image](../../images/outside_texture.PNG)
+
+Clamp will stop tiling and just stretch the last pixel row if the texture tiling property is set to more than 1 in the x or y dimensions. Repeat makes it tile but only in accordance with the tiling property setting, not scale. 
 
 ## Geometric Texture Mapping
 Depending on how we define the function the result texture can vary. The function can be defined so that coordinate would be:
@@ -126,7 +128,7 @@ As mentioned before, **pixel** is the unit of a screen space while **texel** is 
 - undersampling texture maps: less pixels on the screen than texels on the texture
 
 ## Oversampling
-This occurs when more pixels map to a single texel, resulting in a *nearest neighbor*:
+This occurs when more pixels map to a single texel, resulting in a **nearest neighbor**:
 
 ![Image](../../images/nearest_neighbor.PNG)
 
@@ -143,6 +145,8 @@ To solve this jagged edges appearance, we apply interpolation:
 The below calculation shows the yellow value having the highest coefficient as 1-a > a and 1-b > b in this case:
 
 ![Image](../../images/bilinear_calculation.PNG)
+
+- **nearest-neighbors**: repeat what the nearest neighbor did
 
 ## Undersampling
 This occurs when some pixels are compressed with too many texels. This means one pixel doesn't necessarily correspond to one texel. This is why the further we go to the back, the more texels compressed into the one pixel:
