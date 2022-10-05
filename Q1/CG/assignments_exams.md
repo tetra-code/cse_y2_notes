@@ -143,3 +143,5 @@ from the origin.
 - For last question in shadows, it is the shadow map and thus you apply the scale and filter and then compute the coordinate values
 
 - Remember that for diffuse and specular, you have to get the sum of each light value present, not just one. For ambient it is all uniform so doesn't matter.
+
+- near plane and image plane are DIFFERENT things. Focal length f applies to image plane. image plane isn't needed in OpenGL.
