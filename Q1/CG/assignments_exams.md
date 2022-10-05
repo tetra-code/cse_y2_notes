@@ -157,3 +157,5 @@ from the origin.
 - For image plane length calcualtion, remember some useful formulas. For example 
 
 sin(2x) = 2 * cos(x) * sin(x)
+
+- be aware that sometimes the information they give us is worthless
