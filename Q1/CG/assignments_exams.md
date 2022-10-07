@@ -78,8 +78,8 @@ rotationMatrix(-computeAngle(body.orbitPeriod, time), yaxis) *  /
 
 rotationMatrix(computeAngle(body.spinPeriod, time), yaxis)      // moon static-rotate
 ```
-
-Remember that vector is not the same as position. Position is a point on a space. A vector is a direction from point A to point B. Just because they are both in the form of glm::vec3 in C++ does NOT mean same thing.
+## Others
+- Remember that vector is not the same as position. Position is a point on a space. A vector is a direction from point A to point B. Just because they are both in the form of glm::vec3 in C++ does NOT mean same thing.
 
 To get a vector going in the direction of point A:
 ```
@@ -88,7 +88,7 @@ point.A - point.B
 
 If we did point.B - point.A, it is going in the direction of point B
 
-When we calculate the dot product of two vectors, we are calculating their cosO, with O being the angle. Lets say we have a normal vector from a surface point and a light vector. In order to make sure that the light is only reflected ABOVE the surface and NOT BENEATH the surface:
+- When we calculate the dot product of two vectors, we are calculating their cosO multiply by their magnitudes, with O being the angle. Lets say we have a normal vector from a surface point and a light vector. In order to make sure that the light is only reflected ABOVE the surface and NOT BENEATH the surface:
 
 ```
     if (glm::dot(normal, lightVector) < 0.0)
@@ -97,8 +97,10 @@ When we calculate the dot product of two vectors, we are calculating their cosO,
 
 This is because if the angle between normal vector and a vector is between 90 ~ 270 degrees (beneath the surface), cosO is [-1, 0]. Therefore, any dot product that is less than 0.0 can be dark.
 
+If we applied normalization, then cos0 is only the dot product as magnitude multiplication 1 * 1 =1;
 
-For the shading assignment, the light, reflection, half-way, view (camera) vector ALL have to me normalized.
+
+- For the shading assignment, the light, reflection, half-way, view (camera) vector ALL have to me normalized.
 (L, R, H, V)
 
 cross product of two vectors returns a new vector that is perpendicular to both vectors. But keep in mind that this result in a vector, which starts in the origin (0, 0, 0). If you wanted to use this result vector to get to a point, the selected position must be added to the vector (thing of it as 'new' origin). In addition, make sure the vector you use in cross product is in right direction.
@@ -116,12 +118,12 @@ when pedaled full 360 degrees. iT IS absolute since we are pedal goes clockwise.
 
 - focal length, is when the image (projection) plane's center to top distance is one and projection plane's center to bottom distance is also one. To find focal length, find the projection plane coordinate such that the length from its center to top is 1 and center to bottom is also 1
 
-- Remember that black pixel + white pixel does NOT equal gray. as 0.0 + 1.0 = 1.0. Same for gray: black pixel + gray pixel =
+- Remember that black pixel + white pixel does NOT equal gray. as 0.0 + 1.0 = 1.0. Same for the rest:
 
-black + white = white
-black + black = black
-black + gray = gray
-gray + white = white
+- black + white = white
+- black + black = black
+- black + gray = gray
+- gray + white = white
 
 - To check if any point is inside triangle, make it into a linear (matrix multiplication) form and do the gaussian elimination
 
@@ -147,14 +149,17 @@ sin(2x) = 2 * cos(x) * sin(x)
 
 or 
 
-use the y / x to get a 'linear equation' like expression and find the variable values
+use the y / x to get a 'linear equation' like expression
+
+or 
+
+us pythagorass formula
 
 - remember reflection vector formula:
 
 **r = d - 2(d*n)n **
 
-where d is light vector going 'in' (surface - light), n is the normal vector
-and normalized. d is NOT normalized
+where d is light vector going 'in' (surface - light), n is the normal vector and normalized. d is NOT normalized for this formula.
 
 - When they give you a point, make sure whether you need a find a VECTOR or just use that point. If it is vector, then think about the vector direction. For example, *light - surface* will give you vector in the light direciton. *surface - light* will give you in the surface direction. Remeber 'first come first served' 
 
@@ -167,7 +172,6 @@ texture interpolation types:
 - **linear interpolation**
 - **bilinear interpolation**
 - **trilinear interpolation**
-
 
 outside the texure (border behavior)
 - **border**: constant color
@@ -182,7 +186,7 @@ For below whether the use clamping or repeating vertically doesn't matter anymor
 
 - if Texture depth (shadow map) < Pixel depth, pixel is obstructed and should be in shadow
 
-- if Texture depth (shadow map) >= Pixel depth, pixel is lit
+- if Texture depth (shadow map) >= Pixel depth, pixel is lit. Pixel is the thing the light "sees" when it looks in the given direction. The pixel is at depth x, light sees something at depth x, therefore it must be the pixel. 
 
 - if 3 out of 9 texels' depths are lower than the pixel's, then 1/3rd of the light on that pixel should be obstructed, and so on. Thus project only 2/3 of the original light intensity
 
@@ -194,4 +198,12 @@ If we say 2 x 1 matrix, it is a height of 2 and width of 1.
 
 ![Image](../../images/2by1_matrix.PNG)
 
-- 
+- When calculating triangle ratios, don't forget pthagoras theorem as well.
+
+- when doing dot product for shading, don't forget that the light vector is 'out', thus light position - surface position. In addition, normal vector AND light vector needs to be normalized before doing dot product.
+
+For reflection vector formula, only normal vector needs to be normalized and not light vector
+
+- shadow mapping does not share the same characteristics as mipmapping. *Shadow map contains depth values while mipmap contains color values.* It is quite safe to filter mipmap, because what you are **filtering is colour and usually colour is the last step of the whole process**. However, what stores in shadow mapping is depth value, which would be further be used as comparison with the depth of object. When you are **filtering depth, what you are doing is you mutually alter the scene that you are rendering,** which would further mess up the comparison.
+
+*Percentage-closer filtering* means filtering the comparison result to determine whether an object is in shadow or not. This is pretty **safe to filter because you are not changing the scene.**

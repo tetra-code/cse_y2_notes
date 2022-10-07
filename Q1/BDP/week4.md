@@ -184,3 +184,7 @@ The two generals problem setting:
 This makes the generals of A1 and A2 impossible to sync their time of attack.
 
 ### Byzantine generals problem
+
+
+
+Consistency vs Isolation
