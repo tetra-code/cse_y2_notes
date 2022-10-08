@@ -1,8 +1,11 @@
-Fundamental property of distributed systems:
+# Intro
+The reason why distributed systems are hard to implement:
 
-Messages sent between machines may arrive zero or more times at any point after they are sent
+*Messages sent between machines may arrive zero or more times at any point after they are sent*
 
-Avoid implementing or relying on a distrubted system if possible. Otherwise, only use available solutions
+If possible, avoid distributed systems. 
+
+No single source of truth in a distributed system.
 
 # Parallel vs Distributed Systems
 *Distributed system* is a software system in which components located on networked computers communicate and coordinate their actions by passing messages.
@@ -27,7 +30,7 @@ Distributed system characteristics:
 - needs to be fault tolerant; one node failure doesn't fail the entire system.
 
 Why building distributed systems is hard:
-- often fails and difficult to spot the failure (split-brain scenarios)
+- often fails and difficult to spot the failure (**split-brain scenario**)
 - maintaining order/consistency is hard
 - coordination is hard
 - partial operation must be possible
@@ -226,25 +229,32 @@ E6. D
 receives from B: [A(2,0,2,0),B(0,1,0,0),C(1,0,2,0),D(0,1,0,1)]
 ```
 
-## Distributed Decision making
-Reaching a consensus in a distrubted system is a fundamental problem. This is due to in a distributed setting:
+# Distributed Decision making
+Reaching a consensus in a distrubted system hard because the systems are distributed. This causes:
 - nodes can't know anything for sure
 - invidiual nodes can't rely on their own information (unsync clocks, unresponsive other nodes)
-- *Split-brain* scenarios: Parts of the system know a different version of the truth than the other parts
+- **Split-brain** scenarios: Parts of the system know a different version of the truth than the other parts
 
-As mentioned before, there is no single source of truth 
+As mentioned before, there is no single source of truth thus the entire nodes must come to an agreement/consensus in case of a faulty node. Consensus includes the following:
 
-### Reaching consensus
-    Resource allocation
-    Committing a transaction
-    Synchronizing state machines
-    Leader election
-    Atomic broadcasts
+- Resource allocation
+- Committing a transaction
+- Synchronizing state machines
+- Leader election
+- Atomic broadcasts
 
-### 2 generals problem
+# Theoretical problems 
+In theory we don't assume any byzantine settings (although we should as this happens a lot in real life).
 
-![Image](../../images/two_generals.PNG)
+## FLP impossibility
+The **The FLP impossibility** states in a distributed system with the following constraints:
+- async network
+- no clocks nor timeouts
+- no random number generators
 
+Under these constraints if at least one node fails consensus can't be reached. But in real life this can be solved using randomization and partial synchrony.
+
+## 2 generals problem
 The two generals problem setting:
 - 2 armies camped in opposing hills (A1 and A2)
 - They must both attack the enemy (B) at the same time to win. Otherwise will lose.
@@ -252,80 +262,106 @@ The two generals problem setting:
 - They need to decide on a time to attack
 - Enemy (B) is camped between the two hills and can at any time intercept the messengers
 
-This makes the generals of A1 and A2 impossible to sync their time of attack.
+![Image](../../images/two_generals.PNG)
 
-### Byzantine generals problem
+This makes the generals of A1 and A2 impossible to sync their time of attack. Of course in real life this can be (partially) solved using randomization, timeouts, partial synchrony.
 
+## Byzantine generals problem
+In real life nodes can not only be faulty but can also be malicious. They are called **byzantine nodes**.
 
+This problem simulates the presence of a byzantine node. Here we assume only one traitor (malicious) here. In real life, we never know exactly how many.
 
-Consistency vs Isolation
+- 3 divisions of the Byzantine army are camped outside an enemy city, each division commanded by its own general.
+- They must decide upon a common plan of action: Attack or Retreat.
+- The generals can communicate with each other only by messengers.
+- There might be a traitor (malicious or arbitrary behavior).
+- All loyal generals must agree on a plan.
 
+# Consensus protocol
+A consensus protocol defines a set of rules for message exchange and processing for distributed components to reach agreement.
 
-FLP impossibility - in an async network, consensus can't reach if at least one node fails
+Basic properties of crash fault-tolerant consensus protocols include:
 
-Async communications
+- Safety: Never returning an incorrect result *in the presence of non-Byzantine conditions.
+- Availability: Able to provide an answer if (n/2) + 1 nodes are operational
+- No clocks: They do not depend on RTCs to work
+- Immune to stranglers: If n/2+1 nodes vote, then the result is considered safe.
 
+## Fault tolerant consensus
+There are several kinds of consensus protocols with different purposes. For N nodes, f faulty nodes:
 
-Byzantine general problem:
-*we assume only one traitor (malicious) here. 
-In real life, not sure exactly how many
+- **Practical Byzantine Fault Tolerance** or **PBFT**: a *Byzantine fault-tolerant* consensus protocol. N must be of at least size *N>=3f+1* in order to reach tolerant consensus.
+*If N is not big enough, may be able to detect some malicious nodes but definitely not all of them
 
-PBFT - *Byzantine fault-tolerant* consensus: For N nodes, f faulty ones, N must be of at least size N>=3f+1 in order to reach tolerant consensus
-If N is not big enough, maybe able to detect partial malicious nodes but definitely not all of them
+- **Paxos**, **Raft**: a *crash fault-tolerant* consensus protocol. N must be of at least size   *N>=2f+1*. 
+*Here we don't assume any byzantine nodes. 
 
-Paxos, Raft - *Crash fault-tolerant* consensus with at least N>=2f+1. Here we won't get any malicious messages. So having a  
-f + f + 1
+## State machine replication
+**State-machine**: some logical system that can be in multiple states. A set of transactions defines the system from one state to another. Normally we assume finite states but if we define the system with RTC it can be considered infinite states.
 
-In theory, we assume no malicious nodes so no Byzantine scenario. In practice, byzantine scenario more in real life.
+A **SMR** system is one that where the state-machines are replicated to implement a fault-tolerante distributed system. We literally replicate servers and coordinate client interactions with server replicas. 
 
-State-machine: some logical system that can be in multiple states. A set of transactions defines the transition from one state to another. Normally we assume finite states. (if we define with RTC it can be considered infinite states)
+![Image](../../images/smr.jpeg)
 
-State
+Consensus algorithms can be used in SMR systems to keep the log module of replicated state machines in sync:
+- Consensus protocol provides all replicas to agree on the same order of commands/entries.
+- Paxos and Raft are crash fault tolerant consensus protocols for SMR systems
 
-## Paxos protocol:
-By Lamport. Homogenous system?
+## Paxos consensus protocol:
+The **paxos consensus protocol** has three roles:
 
-Three roles
-- Proposer: chooses a value (or receive from client) and sent itt  oa a set of 'acceptors' to collect votes (kind of a leader but not really as it depends on who received the client message)
-- Acceptor: Vote to accept or reject the vote
-- Learner:
+- **Proposer**: the node chooses a value (or receive from client) and sends it to a set of *acceptors *to collect votes.
+- **Acceptor**: vote to accept or reject values proposed by *proposer*. For fault tolerance only requires majority of acceptor votes, not all of them.
+- **Learner**: when proposal passed, adopts the new value
 
-Paxos is actually hard to implement correctly, not many handling of edge cases
+About paxos the protocol
+- Every proposal consists of a value, proposed by the client, and a unique monotonically increasing proposal number, aka **ballot number**.
+- Any node can become a proposer: whoever receives the message from client becomes the new proposer.
+- In case of two possible proposers (each receive message from different clients at the same time), the node with the higher batllot number will be executed first and then the other.
 
-In paxos anyone can become a proposer (whoever receives the message from client). THus not guaranteed to be proposer for next client message
+Paxos is actually hard to implement correctly and it doesn't handle many edge cases.
 
-In case of two possible proposers (each receive message from different clients at the same time), the node with the higher bottle number will executed first and then the other. 
-## Raft consensus algorithm 
-Leader based asymmetic model. This is able to choose a new leader once the crash is detected. REmember that this is not byzantine fault-tolerant, only crash fault-tolerant.
+There are 4 steps in the protocol
+1. Prepare: proposer selectes **proposal number** n and sends **prepare** request to acceptors
+2. Promise: If the n is higher than every previous proposal number received, then Acceptors return **promise** to Proposer. 
+If the Acceptor accepted a proposal at some point in the past, it must include the previous proposal number, say m, and the corresponding accepted value, say w, in its response to the Proposer.
+3. If the proposer receives a response from a majority of acceptors, then it sends an **accept** request for the proposal n with the highest-numbered proposal among the responses.
+4. If acceptor receives **accept** for a proposal n, it accepts proposal n unless it has already responded to a prepare request having a number greater or equal than the proposal number n.
 
+![Image](../../images/paxus_process.PNG)
+
+## Raft consensus protocol 
+Rapt is a **leader-based** asymmetic model. This means there is a new leader once a crash is detected. Remember that this is not byzantine fault-tolerant, only crash fault-tolerant.
 
 Three roles:
-- Leader
-- Follower
-- Candidate
+- **Leader**: accepts log entries from clients (not other nodes), replicates them on other servers
+- **Follower**: replicate the leader’s state machine
+- **Candidate**: candidate for being a leader, asks for votes
 
-The process starts with the follower 9not leader). If none, becomes for candidate. The majority becomes the leader. The rest can stay in candidate or hears from leader and become follower. Unl
+About the leader elecetion :
+- process starts with the follower, not the leader. If there is no leader, followers can becomes candidates. The candidate with the majority vote becomes the leader. The rest revert back to being a follower to replicate the leader's state machine.
+- Raft selects at most one leader at each term. For some terms, the election may fail and result in no leader for that term.
+- Each node maintains current term value (not gloval view). This term value is exchanged in every RPC
+- Leader constantly receives heartbeat from others, and send msg to only the lagging behind node
+- If two concurrent requests, the same leader will get both requests.
+- Some of the vote msgs may get lost and no majority vote. Then we use timeouts and randomness to vote again.
 
-(LEader constantly receives heartbeat from others, and send msg to only the lagging behind node)
+![Image](../../images/raft_leader.PNG)
 
-IF two concurrent requests, the same leader will get both requests.
+When leader is elected, the leader accepts log entries from clients and replicates them across the servers:
 
-If there are multiple candidates for votes and none has the majority of nodes, if some of the vote msgs are lost and no majority vote time for vote againt after timeout (time out is also random for each process). Use randomness and timeouts 
+- Each log entry has an integer index identifying its position in the log.
+- The leader sends AppendEntries message to append an entry to the log
+- A log entry is committed once the leader that created the entry has replicated it on a majority of the servers.
+- Before being elected as leader the soon-to-be leader's **term**(commites made during different leadership) must be updated
 
+About the below visual:
+- Different colors represent different terms
+- The last node's commit index is at 7. The nodes that don't have commit at index 7 must have been partitioned before that commit was made. The ones with missing indices need to receive it first as anything not committed is lost.
 
-The term value of one value can be different from . Every has current term value (not global view). This taerm value is exchanged in every RPC, 
+![Image](../../images/log_replication.PNG)
 
-Guaranteed Raft selects at most one leader at each term
-
-ONce leader is selected, it does log replication. A log entry is committed once the leader that creates the entyr has replicated it on a majority of the servers. 
-
-Commit index is at 7 in the slides. The oens that don't have commit nidex 7 must have been partitioned before index 7 made. The ones with missing indices need to receied first. *anything not committed is lost
-
-Leader appends 9 and then crash wihtout replicate. In taht case only middle can be leader since it has the hightest latest. 
-*different colors repreent each term (commites made during different leadership)
-
-FOr the ones without all the commits, those nodes will  get updated once back into the network AND hear from the leader. Before being elected asleader, we must update the term
-
+Assum from above that the leader appends commit at index 9 and then crash without replicate. In that case only middle node can be leader since it has the hightest index out of the other candidates. 
 Raft can 
 ## Distrubted database
 For sync, if another operation in the queue, need to wait until the current one is done for ALL the followers.

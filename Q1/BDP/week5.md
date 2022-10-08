@@ -1,4 +1,6 @@
-# Distrubted file system
+# Distributed databases
+
+# Distrubted filesystems
 Here we will use spark
 
 Windows and MaxOSX already have network filesystems. But additional distriuted file systems are needed as big data processign arose because
