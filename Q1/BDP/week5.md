@@ -147,3 +147,5 @@ Common actions on RDDs:
 
 
 aggregate vs fold: types are different. With aggregate tye type may be different etween A and B, with fold they are all the same type.
+
+With transformation we create new RDD and with an action we finally compute the RDD (no more RDD) 
