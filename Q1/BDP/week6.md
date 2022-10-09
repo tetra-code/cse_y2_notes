@@ -1,13 +1,10 @@
 # Scala with Spark
-Here we will use spark
-
 Big data processing in distributed setting. It is expensive to move data from one location to other
 
 - Latency. For accessing data in memory, it is 1000 slower on disk and in network 1000000 slower
 - Partial failure. 100s of machines may fail at any time
 
-## Map/Reduce concept
-
+# Map/Reduce concept
 Use map/reduce to solve the distributed system algorithm
 
 
@@ -34,9 +31,7 @@ New technology (created in 2009). Originally most systems are built around acycl
 
 Also available in Python to allow python programs to acces java objects in a remote JVM. The PySpark PI is designed to do most compuations in the remote JVM, if processing needs to happen IN Python
 
-
-
-### RDD (Resilient Distributed Dataset)
+# RDD (Resilient Distributed Dataset)
 RDDs are the core abstraction that Spark uses.
 Huge dataset (immutable). Reside mostly in memory
 

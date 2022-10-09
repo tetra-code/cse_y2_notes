@@ -1,10 +1,7 @@
-# Key/Value pairs
+# FP: Basics
+
 Key value is used often in BDP because of ease of use.
 
-
-# Functional programming 
-
-### Basics
 Basically programs are constructed by applying and composing functions
 
 At heart, an imperative program is a set of statements that are executed one after another (iterative). Similarly, a functional program is a complex expression made up of functions that's simplified by applying those functions.
@@ -62,7 +59,7 @@ Functional programming characteristics:
 - Laziness: The art of waiting to compute till you can wait no more
 - no need for loops. It uses instead recursion or high order functions.
 
-### No loops in FP
+# No loops in FP
 
 *Imperative languages need loops because they have no other way to write iterative code. Functional languages do: recursion. 
 
@@ -70,7 +67,7 @@ Useful higher-order functions include Map, filter, fold and friends as they pack
 
 not loops with mutable iterator variables (like for-loop or while-loop). higher-order functions come in. Map, filter, fold and friends package up common recursive patterns into library functions that are easier to use than direct recursion and signal intent. 
 
-### OO to FP
+# OO to FP
 ** come back to this again when reviewing
 The below is flawed for FP as it has side effects and the function is not testable.
 
@@ -98,7 +95,7 @@ Solutions is to separate and break the eternal dependencies.
 
 THe for loop the 
 
-## Immutable data structures
+# Immutable data structures
 Scala has both mutable and immutable versions of many common data structures. If in doubt, use immutable.
 
 ```
@@ -163,7 +160,7 @@ def doubleAll(ints: List[Int]): List[Int] = ints match {
 }
 ```
 
-### Higher-order function
+# Higher-order function
 As mentioned before, higher-order function is a function that can accept a function as an argument or returns a function.
 
 ```
@@ -193,7 +190,7 @@ Some import higher-order functions:
 
 *flatMap appends all the created lists from an element into one single list
 
-## Laziness
+# Laziness
 Laziness is an evaluation strategy which delays the evaluation of an expression until its value is needed. Here you acutally use the keyword *lazy*
 
 Allows to separate defining how you evaluate a value from when you actually evaluate it.
@@ -232,7 +229,7 @@ Laziness is useful for
     // Mapping
     // Filtering
     // Filtering
-    //Filtering
+    // Filtering
 ```
 
 ```
@@ -253,7 +250,7 @@ Laziness is useful for
 
 Scala lists, maps are eager to output as fast as possible. Lazy lists help form lazy pipelines. In tools like Spark and Flink, we always express computations in a lazy manner. This allows for optimizations before the actual computation is executed
 
-## Monads
+# Monads
 design pattern to define how functions can be used togeter to build generic types.
 Practically, a monad is a value-wrapping type that:
 * Has an identity function * Has a flatMap function, that allows data to be transferred between monad types
@@ -278,7 +275,7 @@ In SCala, object keyword is a singleton and a class is the template to be able t
 
 In the Amazon example: login returns Future[Amazon] which we then use flatMap with Future[Amazon].search, which returns a Future[seq[string]]. THerefore type of result is a Future[seq[string]]. In Scala, declaration of the value of Future[T] is Option[Try[T]]. THus result.value is Option[Try[Seq[String]]]
 
-## Big datasets
+# Big datasets
 In a big data system:
 - client code processes data
 - a data source is a container a data

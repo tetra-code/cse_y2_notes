@@ -1,8 +1,4 @@
-# Week 1
-
-# Scala 
-
-## Basics
+# Scala: Basics
 - Scala is both Object Oriented and Functional programming
 
 - Type inference is used extensively
@@ -86,7 +82,7 @@ The last default is to make sure the data falls into at least one of them.
 
 - In functional programming we use recursion not loops. THis is because loops are not functional as they can change and are mutable.
 
-## Data structures
+# Scala: Data structures
 Different types of data structure:
 
 - *Unstrucutred data*: format is not known such as text documents or HTML pages. Not searchable
@@ -96,7 +92,8 @@ Different types of data structure:
 To be classified as structured, it requries some type of schema. 
 
 Data frequently transferred between different systems. If the data is structured, the other system may need to install additional software to read that structured data. Semi-structured or unstructured data is easier to maintain and easier to move around with it. 
-### List
+
+## List
 In functional programming a List is more common than an Array.
 
 ```
@@ -116,8 +113,7 @@ Remember a list is a link of references. If you need to add item in the middle, 
 
 For this reason, in scala it is almost always prepend for the shallow copying and referencing while in large file systems it is almost always appends.
 
-
-### Set
+## Set
 Set stores values, without any order or repeated values
 
 ```
@@ -125,7 +121,7 @@ Set stores values, without any order or repeated values
     s: scala.collection.immutable.Set[Int] = Set(1, 2, 3, 4)
 ```
 
-### Map or Dictionaries
+## Map or Dictionaries
 Maps or Dictionaries or Associate Arrays ia a collection of (k, v) pairs. k must be unique. One key always corresponds to one value. We can choose between Hashmap or Treemap, where accessing takes O(1) for hashmap and O(n) for treemap. In BDP, hashmap is often preferred due to speed and no need to sort the keys all across the database.
 
 ```
