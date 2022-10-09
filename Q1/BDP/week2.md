@@ -1,9 +1,8 @@
-# Week 2
-
-## Key/Value pairs
+# Key/Value pairs
 Key value is used often in BDP because of ease of use.
 
-## Functional programming 
+
+# Functional programming 
 
 ### Basics
 Basically programs are constructed by applying and composing functions

@@ -133,7 +133,7 @@ Partial order explains how sometimes events happen with no possible causal relat
 
 When multiple senders/receivers are involved, we need an external ordering scheme:
 - **total ordering**: EVERY pair of events can be placed in some order (usually by global time)
-- **casual ordering**: order can be defined by a relationship between two events
+- **causal ordering**: order can be defined by a relationship between two events
 
 Total ordering only possible if our message rate is *globally* bounded (e.g. 1 msg/sec/receiver), and less fine-grained than our clock accuracy (e.g. ms range), then synchronized RTCs are enough to guarantee order.
 
@@ -182,7 +182,7 @@ For two events a and b, *if a → b, then LT(a) < LT(b)*. But the same does *not
 ![Image](../../images/lamport_timestamp_example.PNG)
 
 # Vector clocks
-**Vector clocks** are used to maintain casual order.
+**Vector clocks** are used to maintain causal order.
 
 For a system with N nodes, each node i has its own vector Vi of size N.
 
@@ -362,7 +362,7 @@ About the below visual:
 ![Image](../../images/log_replication.PNG)
 
 Assum from above that the leader appends commit at index 9 and then crash without replicate. In that case only middle node can be leader since it has the hightest index out of the other candidates. 
-Raft can 
+
 ## Distrubted database
 For sync, if another operation in the queue, need to wait until the current one is done for ALL the followers.
 For asyn if leader goes down, no way of knowing which nodes successed and which ones failed. In addition all nodes not guaranteed to have same consistent state since each process and finish time can be different and can have different states at a given point.

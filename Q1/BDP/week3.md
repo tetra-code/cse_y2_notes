@@ -1,6 +1,4 @@
-# Week 3
-
-## About UNIX and Bash
+# About UNIX and Bash
 UNIX is a true multiuser operating system; users have their own private space on the machine’s harddisk and are identified by an id number.
 
 Some properties regarding UNIX users:
