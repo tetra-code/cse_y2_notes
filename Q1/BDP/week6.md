@@ -1,6 +1,11 @@
 # Scala with Spark
 Here we will use spark
 
+Big data processing in distributed setting. It is expensive to move data from one location to other
+
+- Latency. For accessing data in memory, it is 1000 slower on disk and in network 1000000 slower
+- Partial failure. 100s of machines may fail at any time
+
 ## Map/Reduce concept
 
 Use map/reduce to solve the distributed system algorithm

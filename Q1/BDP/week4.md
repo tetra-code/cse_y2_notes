@@ -3,6 +3,10 @@ The reason why distributed systems are hard to implement:
 
 *Messages sent between machines may arrive zero or more times at any point after they are sent*
 
+*No way to guarantee that something happens precisely once*
+
+**At least once** semantics: 
+
 If possible, avoid distributed systems. 
 
 No single source of truth in a distributed system.

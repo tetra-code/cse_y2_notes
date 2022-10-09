@@ -276,10 +276,22 @@ Partitioning is always combined with replication as a node failure will result i
 ### Isolation vs Consistency
 
 
-# Distrubted filesystems
-Windows and MaxOSX already have network filesystems. But additional distriuted filesystems are needed as big data processing arose:
-- Availability across different locations
-- Existing file systems like CIFS NFS, are not distributed, as there is a centralized server to maintain consistency, therefore could create bottleneck as data size became bigger.
+# Distributed filesystems
+**Filesystem** is a process that manages how and where data on a storage disk is stored, accessed, and managed. Different from **database** which is a organized physical collection of data.
+
+![Image](../../images/database_vs_filesystem.PNG)
+
+Primary job of the filesystem is to make sure that the data is always accessible and in tact. To maintain consistency, most modern filesystems use a log (just like databases).
+
+Windows and MaxOSX already have network filesystems. But additional distributed filesystems are needed as big data processing arose:
+- Data availability across different locations
+- Existing file systems like CIFS NFS, are not distributed, as there is a centralized server to maintain consistency. This results in bottleneck for huge datasets
+
+Some notable filesystems:
+- Google File System (GFS)
+- Hadoop Distributed File System (HDFS)
+- CloudStore
+- Amazon Simple Storage Service (Amazon S3)
 
 ## Google filesystem
 **Google filesystem** is first notable distributed file system. It is able to:
@@ -289,62 +301,101 @@ Windows and MaxOSX already have network filesystems. But additional distriuted f
 - Fault tolerant
 - High availability
 
+Advantages:
+Reduces interaction w/ master
+Reduces metadata stored on master
+
+Disadvantages: 
+Small files may become hotspots
+-> single node maintains all of the metadata such as namespace, ACLs, mapping from files to chunks, and current location of chunks.
+
+### GFS architecture
 The GFS architecture has:
 - single master (but can also be replicated)
 - multiple chunkserers
 - multiple clients can connect to GFS
 
-The GFS storage model:
+![Image](../../images/gfs.PNG)
+
+GFS is a **journaled filesystem**, meaning all operations are *added to a log first, then applied*. Checkpoints on the log are created periodically and log is replicated across nodes.
+
+### GFS storage model:
 - single file can contain many objects (web documents)
 - Files are divided into fixed size chunks (64MB) with unique identifers generated at insertion time
+- Disk seek time small compared to transfer time
 - Single file larger than node's disk space
 - fixed size makes allocation computations easy
 - Files are replicated across chunk servers (at least 3, so can be in 1 chunk server of 3 instances or 1 instance for 3 different chunk server)
-- Neither client nor chunkserver cache file data as the data is huge.
+- Neither client nor chunkserver caches file data (since data is huge)
+
+### GFS operations
+GFS read:
+1. Client sends read request to master server
+2. Master replies with location and identifier of the chunkserver replicas
+3. Client caches the metadata
+4. Client sends the data to one of the chunkserver replicas
+5. The corresponding chunkserver replica returns the requested data
+
+*notice how master replies with location of multiple replicas but client only sends to one of them*
 
 GFS write:
-1. Client sends a request to master server
-2. MASTER SENDS TO CLIENT THE LOCATION O THE CHUNKSERVER replica and primary replica
-3. Client sends the write data to all replicas chunk server's buffer
-4. Once replicas receive dat, client teslls primary replica to begin the write function (primary assigns serial number to write requests)
-5. The primary replica writes the data to the appropriate chunk and same is done on secondary replicas
-6. The secondary replias complte the write function and reports back to primary
+1. Client sends a write request to master server
+2. Master replies with location of the *chunkserver replicas and the primary replica*
+3. Client sends the data to ALL of the chunkserver replicas' buffers
+4. Once the replicas receive the data, the client tells the primary replica to begin the write function (primary assigns serial number to write requests)
+5. Primary replica writes the data to the appropriate chunk and then the same is done on the secondary replicas
+6. Secondary replias complte the write function and reports back to primary
 7. primary sends confimation to client
-(eventual consistency. If one of the replicas fail, it will come back alive in stale state and retry to be consistent)
+
+*notice how master replies with location of multiple replicas and client sends data to ALL of them*
+*eventual consistency. If one of the replicas fail, it will come back alive in stale state and retry to be consistent*
 
 ![Image](../../images/gfs_write.PNG)
 
 GFS operation:
-- master does not keep a persistent reor of chunk locations but instead queries the chunk servers at statup and then updated by periodic polling.
-- GFS is a journaled file
-- If current master fails, recovers by rerunning the operation log
-- If chunkserver fails, it just restarts
+- master does not keep a persistent record of chunk locations but instead queries the chunkservers at statup and then updates it by periodic polling.
+- If current master fails, recovers by rerunning the operation log.
+- If chunkserver fails, it just restarts.
+- Chunkservers use checksums to detect data corruption.
+- master maintains a chunk version number to distinguish between up-to-date and stale replicas.
+- before operation on a chunkserver, master ensures version number is up-to-date.
 
-GFS consistency model:
-- Has a *relaxed consistency model* (**eventual consistency**) that supports highly distributed applications. 
-- File namespace mutations are atomic (handled in master), handled in a global order
-- State of file region (kept in chunkserver), whether it is concurrent mutaion or single one
+### GFS consistency model
+GFS has a *relaxed consistency model* (**eventual consistency**) that favors availability over strong consistency. This means:
+- File namespace mutations (file creation) are atomic, handled in master (global order)
+- state of a file region after a data mutation depends on the type of mutation, whether it succeeds or fails, and whether there are concurrent mutations. 
 
+Terms to know to understand GFS:
+- **Consistent**: all replicas have the same value -> all clients see always the same data regardless of which replica they read from
+- **Defined**: each replica reflects the performed mutation
+- **Write**: erase what was previously on the file
+- **Append**: add new information to the end of the file 
 
+append completes atomically *at least once*. Remember in distributed systems no guarantee of exactly once.
 
+![Image](../../images/gfs_consistency_model.PNG)
 
-Terms used specifically for GFS:
-- Write: changes to data are orderesd as chosen by a primary
-- Record append: completes atomically at least once
-- Consistent: if all clients see always the same data, regardless of which replicas they read from
-- Defined: if the region is consistent and clients will see what the mutation writes in its entirety
+*Scenario 1: failed concurrent record append that could result in undefined and inconsistent regions*
+If a replica failed to acknowledge the mutation, it may not have performed it. In that case when the client retries the append, this replica will have to add padding in place of the missing data, so that the record can be written at the right offset. So one replica will have padding while other will have the previously written record in this region.
 
-defined but inconsistent (writes guaranteed to be happen at least once)
+*Scenario 2: successful concurrent record append that could result in record duplication, defined but inconsistent*
+If a record append fails at any replica, the client retries the operation. As a result, replicas of the same chunk may contain different data possibly including duplicates of the same record in whole or in part.
+-> any failure on a replica (e.g. timeout) will cause a duplicate record on the other replicas. This can happen without concurrent writes.
 
-GFS favors availability over strong consistency.
+*Scenario 3: failed concurrent writes that could result in undefined and inconsistency*
+A failed write can cause an inconsistent region. 
 
-learn what happens in what mutation and such
+*Scenario 4: successful concurrent writes that could result in consistent but undefined*
+More interestingly, successful concurrent writes can cause consistent but undefined regions. If a write by the application is large or straddles a chunk boundary, GFS client code breaks it down into multiple write operations. They may be interleaved with and overwritten by concurrent operations from other clients. Therefore, the shared file region may end up containing fragments from different clients, although the replicas will be identical because the individual operations are completed successfully in the same order on all replicas. This leaves the file region in consistent but undefined state.
 
 ## HDFS - Hadoop Distributed File System
-Unlike GFS it is opensource. Same architecture as GFS but different names
+HDFS is similar to GFS but some differences:
+- HDFS is a user-space filesystem written in Java.
+- HDFS is opensource. 
+- Same architecture as GFS but different names.
 
-Big data processing in distributed setting. It is expensive to move data from one location to other
+![Image](../../images/hadoop.PNG)
 
-- Latency. For accessing data in memory, it is 1000 slower on disk and in network 1000000 slower
-- Partial failure. 100s of machines may fail at any time
+HDFS looks like a UNIX filesystem, but does not offer the full set of operations.
 
+![Image](../../images/hdfs.PNG)
