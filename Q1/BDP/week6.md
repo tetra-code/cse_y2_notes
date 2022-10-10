@@ -1,37 +1,67 @@
-# Scala with Spark
-Big data processing in distributed setting. It is expensive to move data from one location to other
+# Parallelism meets data processing
+Parallelism is about speeding up computations by using multiple processors.
 
-- Latency. For accessing data in memory, it is 1000 slower on disk and in network 1000000 slower
-- Partial failure. 100s of machines may fail at any time
+- **Task parallelism**: Different computations performed on the same data
+- **Data parallelism**: Apply the same computation on dataset partitions
 
-# Map/Reduce concept
-Use map/reduce to solve the distributed system algorithm
+BDP in a distributed setting is hard due to:
+- Latency: accessing data is 1000x slower on disk and in network 1000000x slower than accessing data in memory
+- Partial failure: 100s of machines may fail at any time
 
+# Map/Reduce model
+The **map/reduce model** is a programming model for processing big data sets with a parallel, distributed algorithm on a cluster. It has a **map phase** and **reduce phase** and both done in parallel.
 
-    map(List[(K1, V1)], f: (K1, V1) -> (K2, V2)): List[(K2, V2)]
-    reduce((K2, List[V2])): List[(K3, V3)]
+```
+map(List[(K1, V1)], f: (K1, V1) -> (K2, V2)): List[(K2, V2)]
+reduce((K2, List[V2])): List[(K3, V3)]
+```
 
-Map phase and Reduce phase are both done in parallel.
+![Image](../../images/map_reduce.png)
 
-It is fault tolerant but lacks performance:
+- DFS chunks are assigned to Map tasks processing each chunk into a sequence of KV pairs.
+- Periodically, the buffered pairs are written to local disk.
+- The keys are divided among all Reduce tasks.
+- Reduce tasks work on each key separately and combine all the values associated with a specific key.
 
-- Before each Map or reduce step, there are these shuffling and iterative writes that is siginificant latency
-- Hard to express iterative problems M/R. Not generalaible to all possible problems (good for word count). If we want to iterate something, the whole cycle has to be repeated.
+## Hadoop Map/Reduce
 
-Some solution is to save the shuffling in memory. 
+![Image](../../images/hadoop_map_reduce.png)
 
+The above model is fault tolerant but lacks performance:
+- Before each Map and Reduce phase, there are these shuffling and iterative writes; significant latency
+- If a problem requires iteration, the whole cycle has to be repeated. Thus hard to express iterative problems in M/R
 
 ## DryadLINQ
 
-## FlumeJava
-Not only MapReduce but programmer write his own construct. In practice, not very easy to work with. Functional programming Scala is much better
+![Image](../../images/DryadLINQ.png)
 
-## Spark
+## FlumeJava
+From Google
+
+Not only Map/Reduce provides other simple abstractions for programming data-parallel computations. In practice, not very easy to work with.
+
+```
+PTable<String,Integer> wordsWithOnes =
+  words.parallelDo( new DoFn<String, Pair<String,Integer>>() {
+    void process(String word,
+                  EmitFn<Pair<String,Integer>> emitFn) {
+      emitFn.emit(Pair.of(word, 1));
+    }
+  }, tableOf(strings(), ints()));
+
+PTable<String,Collection<Integer>>
+  groupedWordsWithOnes = wordsWithOnes.groupByKey();
+
+PTable<String,Integer> wordCounts =
+  groupedWordsWithOnes.combineValues(SUM_INTS);
+```
+
+# Spark
 New technology (created in 2009). Originally most systems are built around acyclic (not iterable). Spark is open source cluster computing framework. While spark itself is implemented in Scala. It uses the 'Akka' actor framework to handle distributed state and Netty to handle networking. 
 
 Also available in Python to allow python programs to acces java objects in a remote JVM. The PySpark PI is designed to do most compuations in the remote JVM, if processing needs to happen IN Python
 
-# RDD (Resilient Distributed Dataset)
+## RDD (Resilient Distributed Dataset)
 RDDs are the core abstraction that Spark uses.
 Huge dataset (immutable). Reside mostly in memory
 

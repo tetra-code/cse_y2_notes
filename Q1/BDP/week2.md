@@ -168,7 +168,6 @@ val x = List(1,2,3,4,5) match {
 ```
 
 Below are examples of recursion on data strucutures. Note they are not tail recursive:
-
 ```
 def incrementAll(ints: List[Int]): List[Int] = ints match {
     case Nil => Nil
@@ -181,26 +180,23 @@ def doubleAll(ints: List[Int]): List[Int] = ints match {
 }
 ```
 
-- Pattern matching in scala
-Below won't compile though because we don't have the type *Any*, and there are more than one data types
-
+<!-- Below won't compile though because we don't have the type *Any*, and there are more than one data types -->
+The last default below is to make sure the data falls into at least one of the cases. 
 ```
-    val res = myvalue match {
-        // Match on a value, like if
-        case 1 => "One"
-        // Match on the contents of a list
-        case x :: xs => "The remaining contents are " + xs
-        // Match on a case class, extract values
-        case Email(addr, title, _) => s"New email: $title..."
-        // Match on the type
-        case xs : List[_] => "This is a list"
-        // With a pattern guard
-        case xs : List[Int] if xs.head == 5 => "This is a list of integers"
-        case _ => "This is the default case"
-    }
+val res = myvalue match {
+    // Match on a value, like if
+    case 1 => "One"
+    // Match on the contents of a list
+    case x :: xs => "The remaining contents are " + xs
+    // Match on a case class, extract values
+    case Email(addr, title, _) => s"New email: $title..."
+    // Match on the type
+    case xs : List[_] => "This is a list"
+    // With a pattern guard
+    case xs : List[Int] if xs.head == 5 => "This is a list of integers"
+    case _ => "This is the default case"
+}
 ```
-
-The last default is to make sure the data falls into at least one of them. 
 
 ## High-order function
 **High-order function** is a function that accepts another function as its argument.
