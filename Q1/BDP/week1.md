@@ -170,8 +170,6 @@ val xs = Map(1 -> List(("Martian", 2015), ("Prometheus", 2012)))
 K and V are flexible: that’s why the Key/Value abstraction is key to NoSQL databases, including MongoDB, DynamoDB, Redis etc
 
 # FP: Basics
-Key-value is used often in BDP because of ease of use.
-
 **Imperative programming**:
 - uses statements to change program's state.
 - focus on how program executes (process)
@@ -204,8 +202,6 @@ Scala properties:
 - Statically typed, not dynamic
 - Evaluated expressions have types
 - Return type is the most generic type of all return expressions. If there is no return keyword or the type is not indiciated, the compiler infers the last expression is taken to be the return value.
-- **Trait** is like an interface
-- **case** class is like a blueprint for immutable objects: used to represent data records
 - class **Any** is like the class *Object* in Java; root of the Scala class hierarchy.
 - if a function doesn't return a value, it means it is changing the state (does no longer functional programming).
 - higher-order functions, the Scala compiler checks whether the argument type and the signature matches.
@@ -238,4 +234,50 @@ class Baz (x: INt, y: DOuble, private val z: Int) extends Foo(x,y) with Printabl
     override val s: String= "Bazz"
     override def asString(): String = ???
 }
+```
+
+## Object vs Class
+In Scala the **object** keyword is a **singleton** and a **class** is a template to be able to generate more. 
+```
+object Converter extends App {
+    def toInt(a: String): Try[Int] = Try{Integer.parseInt(a)}
+    def toString(b: Int): Try[String] = Try{b.toString}
+
+    val a = toInt("4").flatMap(x => toString(x))
+    println(a)
+
+    val b = toInt("foo").flatMap(x => toString(x))
+    println(b)
+}
+```
+
+## Trait
+**Trait** is like an interface
+
+It has a collection of abstract and non-abstract methods
+
+## Case
+**case** class is like a blueprint for immutable objects: used to represent data records.
+
+## For loops
+For loops do exist in scala. The **<-** operator is a reserved as an iterator for the for loop.
+
+Example of nested for loop:
+```
+for { 
+    x <- 1 to 5
+    y <- 2 to 6
+} println (x,y)
+
+//result
+(1,2)
+(1,3)
+(1,4)
+(1,5)
+(1,6)
+(2,2)
+(2,3)
+...
+(5,5)
+(5,6)
 ```
