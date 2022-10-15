@@ -334,4 +334,187 @@ Different types of persistence storage levels:
 - **MEMORY_AND_DISK_SER**: RDD saved as serialized Java object (one byte array per partition). More space-efficient. Overflow partitions saved on disk.
 - **DISK_ONLY**: All RDD partitions saved on disk.
 
-# Spark application
+# Spark architecture
+The **spark cluster architecture** has the following components:
+
+- **driver**: accepts user programs and returns results
+- **cluster manager**: resource allocation
+- **worker**: one of many nodes that form the RDD
+- **executor**: does the actual processing; worker nodes can contain multiple executors
+
+![Image](../../images/spark_architecture.png)
+
+Process:
+1. **Driver** accepts user programs
+2. This is sent to the **cluster manager**
+3. **Cluster manager** allocates resource to multiple **workers**
+4. Each worker receives a task and its **executors** does the processing
+5. Each worker sends result back to cluster manager
+6. Cluster manager formats the collective result into one
+7. Cluster manager sends the final result to the driver
+
+## Spark's Toolkit
+![Image](../../images/spark_toolkit.png)
+
+## Fault tolerance
+*Spark is node-fault tolerant* but NOT master-fault tolerant.
+
+If there is a node failure, Spark uses RDD lineage information to know which partitions to recompute. 
+
+*Recomputing happens at stage level.*
+
+To minimize recompute time, use **checkpointing** which is saving job stages to reliable storage. 
+
+## Request resources
+Below is example of starting the application with custom resource configuration:
+
+```
+spark-shell   \
+    --master spark://spark.master.ip:7077 \
+    --deploy-mode cluster  \
+    --driver-cores 12
+    --driver-memory 5g \
+    --num-executors 52 \
+    --executor-cores 6 \
+    --executor-memory 30g
+```
+
+## Job, Stage, Task
+When an action is requested, one or multiple **jobs** are created. The RDD dependency graph is traversed *backwards* and a graph of stages are built.
+
+For the code below, one job is requested:
+
+```
+val result = sc.textFile("sample.txt")
+  .flatMap(_.split(" "))
+  .filter(x => x.length > 1)
+  .map(x => (x, 1))
+  .reduceByKey((a,b) => a + b)
+  .sortBy(_._1)
+```
+
+When a job requires wide dependencies (e.g. groupByKey or sort), it is called a **Stage**. the **Spark scheduler** reshuffles the data and this creates a new stage. Stages are always executed serially and each stage conssits of one or more **tasks**.
+
+![Image](../../images/job_graph.png)
+
+# Formatted data
+If data is formatted, we can create a schema and have the Scala compiler type-check our computations. 
+
+For the following log format, use a regex that can parse the log:
+```
+127.0.0.1 user-identifier frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326
+
+([^\s]+) ([^\s]+) ([^\s]+) ([^\s]+) "(.+)" (\d+) (\d+)
+```
+
+This can be mapped to a Scala case class and use flatMap and pattern matching to filter out bad lines. Then with the filtered logs RDD, do whatever we want with it:
+```
+case class LogLine(
+  ip: String, 
+  id: String, 
+  user: String,
+  dateTime: Date, 
+  req: String, 
+  resp: Int,
+  bytes: Int,
+)
+
+val dateFormat = "d/M/y:HH:mm:ss Z"
+val regex = """([^\s]+) ([^\s]+) ([^\s]+) ([^\s]+) "(.+)" (\d+) (\d+)""".r
+val rdd = sc
+    .textFile("access-log.txt")
+    .flatMap ( x => x match {
+      case regex(ip, id, user, dateTime, req, resp, bytes) =>
+        val df = new SimpleDateFormat(dateFormat)
+        new Some(LogLine(ip, id, user, df.parse(dateTime),
+                         req, resp.toInt, bytes.toInt))
+      case _ => None
+      })
+
+val bytesPerMonth = rdd
+    .groupBy(k => k.dateTime.getMonth)
+    .aggregateByKey(0)(
+      { (acc, x) => acc + x.map(_.bytes).sum },
+      { (x, y) => x + y }
+    )
+```
+
+# Connecting to databases and filesystems
+Spark can go beyond simple textFiles and connect to databases and distributed file systems such as:
+- MongoDB
+- MySQL (over JDBC)
+- Postgres (over JDBC)
+- Amazon S3
+- HDFS
+- Azure Data Lake
+
+```
+val readConfig = ReadConfig(Map("uri" -> "mongodb://127.0.0.1/github.events"))
+sc.loadFromMongoDB(readConfig)
+val events = MongoSpark.load(sc, readConfig)
+
+events.count
+
+val users = spark.read.format("jdbc").options(
+  Map("url" ->  "jdbc:mysql://localhost:3306/ghtorrent?user=root&password=",
+  "dbtable" -> "ghtorrent.users",
+  "fetchSize" -> "10000"
+  )).load()
+
+users.count
+```
+
+# Optimizing partitioning
+Often we need to perform join operations or shuffling operations. When defining your own custom partitioning schemes, you can benefit from 
+
+- Joins between a large, almost static dataset with a much smaller, continuously updated one.
+- reduceByKey or aggregateByKey on RDDs with arithmetic keys benefit from range partitioning as the shuffling stage is minimal (or none) because reduction happens locally!
+
+## Broadcasts
+**Broadcast** is a variable that allow programmers to cache it as a read-only variable on *each* worker. These variables are often precomputed items such as *lookup tables* or *machine learning models*. This way, workers don't need to request a copy of these every time on every shuffling.
+
+Once broadcasts are cached, it can be accessed in parallel by the executors as it is a read-only variable:
+
+![Image](../../images/spark_broadcast.png)
+
+Broadcasts should be relatively big and immutable (obviously).
+
+Broadcasts also allow in-memory joins between a processed dataset and a lookup table:
+
+```
+val curseWords = List("foo", "bar") // Use your imagination here!
+val bcw = sc.broadcast(curseWords)
+
+odyssey.filter(x => !curseWords.contains(x))
+```
+
+## Accumulators
+As mentioned before, we should avoid any side-effects in functional programming. But sometimes it is necessary to keep track of variables like performance counters, debug values or line counts *while* computations are running.
+
+**Accumulator** is a variable that is manipulated by various workers. It is kind of like the opposite of broadcasts:
+- multiple writes are performed on it
+- Only one copy of it exists and always in the driver
+
+Accumulator resides in the driver thus frequent writes to it from the workers will cause large network traffic. 
+
+Accumulators is still a side-effecting operation and should thus be avoided if possible.
+
+```
+// Bad code
+var taskTime = 0L
+odyssey.map{x =>
+  val ts = System.currentTimeMillis()
+  val r = foo(x)
+  taskTime += (System.currentTimeMillis() - ts)
+  r
+}
+
+// Better
+val taskTime = sc.accumulator(0L)
+odyssey.map{x =>
+  val ts = System.currentTimeMillis()
+  val r = foo(x)
+  taskTime += (System.currentTimeMillis() - ts)
+  r
+}
+```
