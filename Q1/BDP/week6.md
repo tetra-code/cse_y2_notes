@@ -1,61 +1,3 @@
-# Parallelism meets data processing
-Parallelism is about speeding up computations by using multiple processors.
-
-- **Task parallelism**: Different computations performed on the same data
-- **Data parallelism**: Apply the same computation on dataset partitions
-
-BDP in a distributed setting is hard due to:
-- Latency: accessing data is 1000x slower on disk and in network 1000000x slower than accessing data in memory
-- Partial failure: 100s of machines may fail at any time
-
-## Map/Reduce model
-The **map/reduce model** is a programming model for processing big data sets with a parallel, distributed algorithm on a cluster. It has a **map phase** and **reduce phase** and both done in parallel.
-
-```
-map(List[(K1, V1)], f: (K1, V1) -> (K2, V2)): List[(K2, V2)]
-reduce((K2, List[V2])): List[(K3, V3)]
-```
-
-![Image](../../images/map_reduce.png)
-
-- DFS chunks are assigned to Map tasks processing each chunk into a sequence of KV pairs.
-- Periodically, the buffered pairs are written to local disk.
-- The keys are divided among all Reduce tasks.
-- Reduce tasks work on each key separately and combine all the values associated with a specific key.
-
-## Hadoop Map/Reduce
-
-![Image](../../images/hadoop_map_reduce.png)
-
-The above model is fault tolerant but lacks performance:
-- Before each Map and Reduce phase, there are these shuffling and iterative writes; significant latency
-- If a problem requires iteration, the whole cycle has to be repeated. Thus hard to express iterative problems in M/R
-
-## DryadLINQ
-
-![Image](../../images/DryadLINQ.png)
-
-## FlumeJava
-From Google
-
-Not only Map/Reduce provides other simple abstractions for programming data-parallel computations. In practice, not very easy to work with.
-
-```
-PTable<String,Integer> wordsWithOnes =
-  words.parallelDo( new DoFn<String, Pair<String,Integer>>() {
-    void process(String word,
-                  EmitFn<Pair<String,Integer>> emitFn) {
-      emitFn.emit(Pair.of(word, 1));
-    }
-  }, tableOf(strings(), ints()));
-
-PTable<String,Collection<Integer>>
-  groupedWordsWithOnes = wordsWithOnes.groupByKey();
-
-PTable<String,Integer> wordCounts =
-  groupedWordsWithOnes.combineValues(SUM_INTS);
-```
-
 # Spark
 Relatively new technology (created in 2009). 
 
@@ -439,31 +381,6 @@ val bytesPerMonth = rdd
     )
 ```
 
-# Connecting to databases and filesystems
-Spark can go beyond simple textFiles and connect to databases and distributed file systems such as:
-- MongoDB
-- MySQL (over JDBC)
-- Postgres (over JDBC)
-- Amazon S3
-- HDFS
-- Azure Data Lake
-
-```
-val readConfig = ReadConfig(Map("uri" -> "mongodb://127.0.0.1/github.events"))
-sc.loadFromMongoDB(readConfig)
-val events = MongoSpark.load(sc, readConfig)
-
-events.count
-
-val users = spark.read.format("jdbc").options(
-  Map("url" ->  "jdbc:mysql://localhost:3306/ghtorrent?user=root&password=",
-  "dbtable" -> "ghtorrent.users",
-  "fetchSize" -> "10000"
-  )).load()
-
-users.count
-```
-
 # Optimizing partitioning
 Often we need to perform join operations or shuffling operations. When defining your own custom partitioning schemes, you can benefit from 
 
@@ -518,3 +435,305 @@ odyssey.map{x =>
   r
 }
 ```
+# Connecting to databases and filesystems
+Spark can go beyond simple textFiles and connect to databases and distributed file systems such as:
+- MongoDB
+- MySQL (over JDBC)
+- Postgres (over JDBC)
+- Amazon S3
+- HDFS
+- Azure Data Lake
+
+```
+val readConfig = ReadConfig(Map("uri" -> "mongodb://127.0.0.1/github.events"))
+sc.loadFromMongoDB(readConfig)
+val events = MongoSpark.load(sc, readConfig)
+
+events.count
+
+val users = spark.read.format("jdbc").options(
+  Map("url" ->  "jdbc:mysql://localhost:3306/ghtorrent?user=root&password=",
+  "dbtable" -> "ghtorrent.users",
+  "fetchSize" -> "10000"
+  )).load()
+
+users.count
+```
+
+# RDDs and structure
+Spark does not know the schema of the data; RDDs only see binary blobs with an attached type.
+
+If they knew the data tpes for each field (schema) join operations can be done a lot faster
+
+Small database related recap:
+```
+val people : RDD[Person]
+val addresses: RDD[(Int, Address)]
+
+//Option 1
+people.keyBy(_.id).join(addresses.filter(x._2._2.city == "Delft"))
+
+//Option 2
+people.keyBy(_.id).join(addresses).filter(x._2._2.city == "Delft")
+
+//Option 3
+people.keyBy(_.id).cartesian(addresses).filter(x._2._2.city == "Delft")
+```
+
+Option 1 is the fastested as we minimize the dataset as much as possible before performing he join operation. 
+
+# SparkSQL
+**SparkSQL** is a library built on top of the Spark RDDs. It allows:
+
+- SQL syntax
+- automatic execution plan optimizations
+- automatic data partitioning optimizations
+- directly connect and use structured data sources (e.g. SQL databases)
+- import CSV, JSON, Parquet, Avro and data formats by inferring their schema.
+
+It first requires us to manually transform the data into a tabular format and describe its schema. Then relational algebra does the optimizations.
+
+It provides two main abstractions:
+- **Datasets**: collections of strongly-typed objects (Scala and Java only).
+- **Dataframes**: basically a `Dataset[Row]` where Row ≈ Array[Object]. Similar to Pandas Dataframes.
+
+The interface to SparkSQL:
+
+![Image](../../images/spark_interface.png)
+
+SparkSQL is very fast thanks to the **catalyst optimizer**. It can take a SQL query, rewrite it so that SparkSQL runs multiple parallel queries instead of 1 complex query. One method is to use range conditions to restrict the examined data volumes.
+
+## SparkSession
+*Like normal Spark, SparkSQL needs a context object (like a Session Object) to invoke its functionality*.
+
+```
+val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
+```
+
+## RDD, Dataframe, and Datasets
+You can create a Dataframe from an RDD. 
+
+A Dataframe can have one or multiple Datasets, which each Dataset being equivalent to a column.
+
+Think of Dataset as an RDD with a single type.
+
+Datasets use special **encoders** to convert data into compact internal formats. This can be used directly by Spark for applying operations like map or filter. 
+
+The above internal format is very efficient and the in-memory data size is less than that on a disk format. 
+
+
+## Creating Dataframes and Datasets
+You can create Dataframes in several ways:
+
+- RDDs containing tuples (e.g. RDD[(String, Int, String)])
+- RDDs with known complex types (e.g. RDD[Person])
+- RDDs with manual schema definition
+- Reading (semi-) structured datafiles
+
+```
+import spark.implicits._
+
+val df = rdd.toDF("name", "id", "address")                // RDD[(String, Int, String)]
+val df = persons.toDF()                                   // types are inferred
+
+val schema = StructType(Array(
+  StructField("level", StringType, nullable = true),      // String type
+  StructField("date", DateType, nullable = true),         // Date type
+  StructField("client_id", IntegerType, nullable = true), // Int type
+  StructField("stage", StringType, nullable = true),      // String type
+  StructField("msg", StringType, nullable = true),        // String type
+))
+val rowRDD = sc.textFile("ghtorrent-log.txt")   
+             .map(_.split(" ")).
+             .map(r => Row(
+                r(0),                                     // String type (default)
+                new Date(r(1)),                           // Date type
+                r(2).toInt,                               // String to Int type
+                r(3),                                     // String type
+                r(4)                                      // String typw
+              )
+            )
+val logDF = spark.createDataFrame(rowRDD, schema)
+
+val jsonDF = spark.read.json("examples/src/main/resources/people.json")
+val csvDF = sqlContext.read.csv(
+  "/datasets/pullreqs.csv", 
+  sep=",", 
+  header=True,
+  inferSchema=True
+)
+```
+
+### Columns
+Once you created a Dataframe, the Datasets can be accessed by name, just like Pandas Dataframes:
+
+```
+df("team_size")
+$"team_size" //scala only
+```
+
+*Columns are defined by expressions*. The API overrides language operators to return expression objects.
+
+```
+df("team_size") + 1
+
+// spark.sql.expressions.Add(df("team_size"), lit(1).expr)
+```
+
+## Dataframe operations
+All typical relational algebra operations can be applied with Dataframes:
+- Projection
+- Selection
+- Joins (as long both Dataframes share a key)
+- Aggregation (only on groupped Dataframes, like SQL)
+
+```
+// projection
+df.select("project_name").show()
+df.drop("project_name", "pullreq_id").show()
+
+// selection
+df.filter(df.team_size.between(1,4)).show()
+
+// join
+people = sqlContext.read.csv("people.csv")
+department = sqlContext.read.jdbc("jdbc:mysql://company/departments")
+people.filter(people.age > 30)
+      .join(department, people.deptId == department.id)
+people.join(
+  department, 
+  people.deptId == department.id,
+  how = left_outer,
+)
+people.join(
+  department, 
+  people.deptId == department.id,
+  how = full_outer,
+)
+```
+
+Like SQL only groupped Dataframes can perform aggregate functions. 
+
+*groupBy* splits the Dataframe in a key/value:
+- key is the different values of the specified column/Dataset (duplicate ones are groupped)
+- value are rows containing each individual value (result of which is the aggregation function)
+
+Below each row is split based on the project_name values. For duplicate values, those rows are merged and in the process, the mean of the lifetime_minutes values is applied.
+
+```
+df.groupBy(df.project_name).mean("lifetime_minutes").show()
+```
+
+# SparkSQL optimization
+SparkSQL is fast as it uses optimization and code generation. 
+
+## Expressions
+It is mentionred before that Dataframe columns are defined by expressions. 
+
+Similarily, code passed to higher order functions (e.g. predicate to filter) is a **syntatic sugar**, meaning it is syntax within a programming language that is designed to make things easier to read or to express (makes the language "sweeter" for human use). This syntatic sugar is converted to expressions more complex expressions. This is done by generating **expression trees**, which is similar to **abstract syntax trees**.
+
+```
+df.filter(df("team_size") > (3 + 1))
+```
+
+Is converted to:
+
+```
+df.filter(GreaterThan(
+              UnresolvedAttribute("team_size"),
+              Add( Literal(3) + Literal(1) )
+          ))
+```
+
+where 'GreaterThan...' expression is the expression tree.
+
+## Slight detour: Abstract Syntax Tree
+Abstract Syntax Tree is a tree representation of the abstract syntactic structure of the source code. 
+
+The syntax is "abstract" in the sense that it does not represent every detail appearing in the real syntax, but rather just the structural or content-related details.
+
+It is used in program analysis and program transformation systems. 
+
+The following code:
+```
+while b ≠ 0:
+    if a > b:
+        a := a - b
+    else:
+        b := b - a
+return a
+```
+
+Can be converted to the following AST:
+
+![Image](../../images/ast.png)
+
+## Catalyst Optimizer
+The **Catalyst optimizer** is responsible for all the optimizations. 
+
+It uses tree patterns to simplify the AST.
+
+The previous expression tree:
+
+```
+GreaterThan(
+  UnresolvedAttribute("team_size"),
+  Add( Literal(3) + Literal(1) )
+)
+```
+
+Is saved as an AST and simplified:
+
+```
+val ast = GreaterThan(
+            UnresolvedAttribute("team_size"),
+            Add( Literal(3) + Literal(1) )
+          )
+val optimized = ast.transform {
+  case Add( Literal(c1), Literal(c2) ) => Literal(c1+c2)
+}
+```
+
+The **Catalyst optimizer** needs:
+- expression tree
+- context (the Dataframe)
+
+to take advantage of Scala’s compiler ability to *manipulate ASTs as Strings*. The below function converts the expression tree:
+
+```
+def compile(node: Node): AST = node match {
+  case Literal(value) => q"$value"
+  case Attribute(name) => q"row.get($name)"
+  case GreaterThan(left, right) =>
+        q"${compile(left)} > ${compile(right)}"
+}
+```
+
+The original code:
+```
+df.filter(df("team_size") > (3 + 1))
+```
+
+The new, optimized code:
+```
+df.filter(row => row.get("team_size") > 4)
+```
+
+The new, optimized code is compiled at *runtime* (not compile time) to JVM code
+
+*Conclusion: when in doubt, provide a schema!*
+
+### Catalyst Optimizer process:
+
+Catalyst performs the following steps:
+
+    Analysis, to get to know the types of column expressions. This will, e.g. resolve UnresolvedAttribute("team_size") to Attribute("team_size") of type Int(and would also check whether team_size exists in df)
+    Rule optimization, as described above
+    Physical optimization, to minimize data movement
+    Code generation, as described before
+
+The end result is native code that runs in optimal locations on top of an RDD.
+
+The phases of query planning in Spark SQL:
+
+![Image](../../images/catalyst_optimizer_process.png)

@@ -399,3 +399,61 @@ HDFS is similar to GFS but some differences:
 HDFS looks like a UNIX filesystem, but does not offer the full set of operations.
 
 ![Image](../../images/hdfs.PNG)
+
+# Parallelism meets data processing
+Parallelism is about speeding up computations by using multiple processors.
+
+- **Task parallelism**: Different computations performed on the same data
+- **Data parallelism**: Apply the same computation on dataset partitions
+
+BDP in a distributed setting is hard due to:
+- Latency: accessing data is 1000x slower on disk and in network 1000000x slower than accessing data in memory
+- Partial failure: 100s of machines may fail at any time
+
+## Map/Reduce model
+The **map/reduce model** is a programming model for processing big data sets with a parallel, distributed algorithm on a cluster. It has a **map phase** and **reduce phase** and both done in parallel.
+
+```
+map(List[(K1, V1)], f: (K1, V1) -> (K2, V2)): List[(K2, V2)]
+reduce((K2, List[V2])): List[(K3, V3)]
+```
+
+![Image](../../images/map_reduce.png)
+
+- DFS chunks are assigned to Map tasks processing each chunk into a sequence of KV pairs.
+- Periodically, the buffered pairs are written to local disk.
+- The keys are divided among all Reduce tasks.
+- Reduce tasks work on each key separately and combine all the values associated with a specific key.
+
+## Hadoop Map/Reduce
+
+![Image](../../images/hadoop_map_reduce.png)
+
+The above model is fault tolerant but lacks performance:
+- Before each Map and Reduce phase, there are these shuffling and iterative writes; significant latency
+- If a problem requires iteration, the whole cycle has to be repeated. Thus hard to express iterative problems in M/R
+
+## DryadLINQ
+
+![Image](../../images/DryadLINQ.png)
+
+## FlumeJava
+From Google
+
+Not only Map/Reduce provides other simple abstractions for programming data-parallel computations. In practice, not very easy to work with.
+
+```
+PTable<String,Integer> wordsWithOnes =
+  words.parallelDo( new DoFn<String, Pair<String,Integer>>() {
+    void process(String word,
+                  EmitFn<Pair<String,Integer>> emitFn) {
+      emitFn.emit(Pair.of(word, 1));
+    }
+  }, tableOf(strings(), ints()));
+
+PTable<String,Collection<Integer>>
+  groupedWordsWithOnes = wordsWithOnes.groupByKey();
+
+PTable<String,Integer> wordCounts =
+  groupedWordsWithOnes.combineValues(SUM_INTS);
+```
