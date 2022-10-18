@@ -1,7 +1,5 @@
-# Week1
-
-## Introduction to Machine Learning
-"No Free Lunch" theorem states that there is no best learning algorithm for all problems. Different problems have different approaches/algorithms that work best
+# Introduction to Machine Learning
+"No Free Lunch" theorem - no best learning algorithm for all problems. Different problems have different approaches/algorithms that work best
 
 Identify regularies in the world by learning from data (examples). The model should work beyond the specific examples it has been given. Machine learning exists because many tasks are too complicated to explicitely code. It is easier to map from input to output using examples. Because it learns about the world using data, strong connection to statistics, signal processing, and optimisation.
 
@@ -45,7 +43,7 @@ Machine learning is basically feeding data (examples) to a model and tweeking it
 - test set: don't have to be labeled
 
 ## Features
-To do the generalization automatically, we must encode the object by defining its *features*. These feature *measurements* or values are stored in vectors. We can interpret measurments as a vector in a vector space. 
+To do the generalization automatically, we must encode the object by defining its **features**. These feature **measurements** or values are stored in vectors. We can interpret measurments as a vector in a vector space. 
 
 ![image](../../images/classification_terms.PNG)
 
@@ -64,56 +62,16 @@ For each object in the feature space, we should estimate the p(w|x), which is  p
 ![image](../../images/pattern_recognition_pipeline.PNG)
 
 
-## Create decision boundary
-Lets use an example. Suppose we have the following gaussian data for some feature 1 and we want to estimate p(w|x), which is the probability that feature 1 is blue. Of course the sum of the probability of feature 1 being every possible class is 1.
+# Inference vs Prediction
+**Inference**: Given a set of data you want to deduce how the output is generated as a function of the data.
 
-![image](../../images/gaussian_data_graph.PNG)
+**Prediction**: Given a new measurement, you want to use an existing data set to build a model that reliably chooses the correct identifier from a set of outcomes.
 
-Based on the data shown in the graph above, assgin the label of the class that has the largest posterior probability. So if p(w1|x) > p(w2|x), we assign the feature x with w1. If p(w1|x) < p(w2|x), assign the feature x with w2. Else, we draw a *decision boundary*. *Note that we are assuming that there are only two possible classes.
+Inference: You want to find out what the effect of Age, Passenger Class and, Gender has on surviving the Titanic Disaster. You can put up a logistic regression and infer the effect each passenger characteristic has on survival rates.
 
-![image](../../images/graph_posterior_probability.PNG)
+Prediction: Given some information on a Titanic passenger, you want to choose from the set {lives,dies}
+and be correct as often as possible. (See bias-variance tradeoff for prediction in case you wonder how to be correct as often as possible.) 
 
-In many cases the posterior probability is hard to estimate, thus we use the *Bayes theorem* to rewrite it into another form:
+Prediction doesn't revolve around establishing the most accurate relation between the input and the output, accurate prediction cares about putting new observations into the right class as often as possible.
 
-![image](../../images/bayes_theorem.PNG)
-
-*class conditional distribution*  also known as *likelihood*, is the probability of feature x is observed, given the conditino of class wi.
-
-*unconditional data distribution* is the probability of feature x is observed in any scenario
-
-*class prior probability* is the probability of a class wi happening, which is the assumed knowledge.
-
-*posterior probability* is the probability of a class wi happening, given that feature x occurs, which is what we want to find.
-
-![image]()
-
-![image](../../images/conditional_probability.PNG)
- 
-To be able to classify a feature space, we need the posterior probability. According to *Bayes rule*, that is possible wiith the *Bayes theorem*:
-1. Estimate the class conditional probability
-2. Multiply each with the class priors (e.i. p(x|w2)*p(w2))
-3. Divide the result of 2 with uncoditional probability of specific feature x (p(x)) to get the posterior probabability
-4. Assign objects to the class with highest posterior
-
-
-Depending on the class-conditional-probability densities or distribution, complicated decision boundaries can appear: 
-
-![image](../../images/complicated_decision_boundary.PNG)
-
-![image](../../images/multi_modal_distribution.PNG)
-
-If the class is too dispersed or the class prior is low (low probability of occuring) can be too small (class prior is low), no objects can be assigned to that class.
-
-![image](../../images/absent_decision_boundary.PNG)
-
-To obtain class conditional probabilities p(x|wi), we need to assume a model beforehand. Estimate the model parameters s.t the example objects fit will. This is where *maximum likelihood estimators* are useful.
-
-Besides the feature vector, other ways of defining objects are:
-
-- dissimilarity approach
-- structural pattern recognition (graph)
-
-But this course will only use feature vector as that is most reliable while others need more research.
-
-## Error and Risk
-
+Given a set of passenger data for a single passenger the inference approach gives you a probability of surviving, the classifier gives you a choice between lives or dies. 
