@@ -182,3 +182,51 @@ Pointers
 - if no class overlap our quality measure is not sufficient: many equally good solutions
 
 # Support vector machines
+Scenario where multiple possible decision boundaries with zero errors
+-> choose one that maximizes the size of the **margin**
+
+**Margin** is the distance of the closest points of each class to the decision boundary:
+
+![Image](../../images/support_vector_machine.PNG)
+
+These objects on the margin are called **support vectors**. Moving these will redefine the decision boundary, while objects outside of the margins don't affect the classifier.
+
+The object is classified as either:
+- positive class
+- negative class
+
+This is based on the sign of the hypothesis function:
+
+![Image](../../images/hypothesis_function.PNG)
+
+Closest objects should be as far away from the decision boundary as possible. Therefore:
+
+![Image](../../images/decision_value.PNG)
+
+To calculate the distance of decision boundary to the closest object:
+
+![Image](../../images/distance_visual.PNG)
+
+![Image](../../images/distance.PNG)
+
+Therefore margin is 2 * distance and we want to maximize the margin:
+
+![Image](../../images/max_margin.PNG)
+
+This is the equivalent to the risk minimisation of the margin:
+
+![Image](../../images/minimize_neg_margin.PNG)
+
+## Soft-margin SVM
+If the data is not linearly separable like below, penalize how far the object is on wrong side of the decision boundary:
+
+![Image](../../images/penalize.PNG)
+
+We add this penalty to our risk minimisation of the margin:
+
+![Image](../../images/soft_margin.PNG)
+
+A lRosesg utelramriz watiitohn n Toe drmata?
+
+# Multiclass classification
+
