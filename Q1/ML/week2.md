@@ -77,7 +77,6 @@ We don't have a true distriution, only a sampled data set. Thus we have to appro
 ![image](../../images/generative_classifier.PNG)
 
 ## Parametric Modeling & Estimation
-<!-- Density estimation - uses non-parametic appraoch. -->
 **Histogram-based density estimation**: approximate desnity by the histogram.
 
 Each bin estimates one value (50 bins, 50 parameters)
@@ -331,6 +330,10 @@ The general form for a two-class nearest mean classifier results in a linear cla
 
 - More flexible classifier needs more training data
 - Simple classifiers still perform quite well in practice
+
+1. estimate global parameters on training set using Gaussian distribution for each of the classes
+2. apply Bayes rule of posterior probability for classification
+
 
 - For now ignore **mixture models**: combination of separate gaussian distributions with separate weights
 - With increasing dimensions / # measurements, does Gaussian or histogram need more data? -> histogram

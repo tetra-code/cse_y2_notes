@@ -1,4 +1,7 @@
 # Introduction to Machine Learning
+
+![image](../../images/roadmap.PNG)
+
 "No Free Lunch" theorem - no best learning algorithm for all problems. Different problems have different approaches/algorithms that work best
 
 Identify regularies in the world by learning from data (examples). The model should work beyond the specific examples it has been given. Machine learning exists because many tasks are too complicated to explicitely code. It is easier to map from input to output using examples. Because it learns about the world using data, strong connection to statistics, signal processing, and optimisation.

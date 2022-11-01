@@ -1,8 +1,6 @@
-# Week 3
-Last week we did parametric density estimatino. Used Gaussian distribution for each of the classes to estimate the global parameters on training set. FOr classificaiton use Bayes rule of posterior probability
-
-## Non-parametric density estimation
-In real life, it is not easy to define distribution types on data sets. Since we don't no distribution, can't esimate the global parameters. And the decision boundaries no longer simple shapes
+# Non-parametric density estimation
+In real life we don't no distribution
+=> can't esimate the global parameters
 
 One way is to use a histogram:
 1. split feature in subregions, or bins, of width h
@@ -10,39 +8,60 @@ One way is to use a histogram:
 3. Estimate the probabily of feature using the formula
 
 Other methods than histogram are:
-- Parzen density esimate
-- K-Nearest-neighbor density estimate
+- **Parzen density esimate**
+- **K-Nearest-neighbor density estimate**
+- **Naive bayes**
 
-*non-parametric might be more accurate when optimized since it gets the average of every data set and don't assume a pre distribution type
+*non-parametric generally more accurate since it gets the average of every data set and don't assume a pre-distribution type
 
-### Parzen density esimate (Kernel density estimation)
-For each data point, we place a *cell* (a.k.a kernel function or window function) and add them all up. 
+# Parzen density esimate (Kernel density estimation)
+Some terms:
+- **Kernel function**: function that accepts vectors as inputs in original space and returns the dot product of the vectors in feature space.
+- **Window function**: mathematical function that is zero-valued outside of some chosen interval
 
-...
+![Image](../../images/kernel_function.png)
 
-We eventually get a distribution but most likely not a known one. 
+**Kernel density estimation** depicts the probability density function of the continuous or non-parametric data variables. It is a better approach than traditional histogram.
+
+1. Apply **kernel function** or a **cell** on each data point. 
+2. Sum these functions together to get the kernel density estimate of the random variable 
+
+Below the kernel density estimate is defined by p(x), where h is he width.
+
+![Image](../../images/kernel_density_estimate.png)
+
+Once we have the probability density function, we can use this along with the Bayes rul to classify the random variable.
+
+Properties:
+- does not assume known distribution
+- estimates probability densities using kernel function
+- uses kernel function of fixed shape and width
+- width h matters
+- use Bayes rule for classification
+
+The parameter (width) h is NOT estimated from our data, thus it is a non-parametric approach
+
+## Kernel function
+For a kernel function K, the following should hold:
+
+![Image](../../images/kernel_function2.png)
 
 Several cell shapes to choose from:
-
 - Gaussian
 - Box
 - Tri
 - Triweight
 
-KDE with a box kernel is not the same a histogram: with a KDE with box kernel, you can count all the boxes and determine how many data points, while histogram doesn't represent the # of data points just by looking at the bin.
+KDE with a box kernel is not the same as histogram: with a KDE with box kernel, you can count all the boxes and determine how many data points, while histogram doesn't represent the # of data points just by looking at the bin.
 
-Example
-Given a set of four data points, lets say we want to find the probability of feature x=3 happening. Use the kernel function with width h=1 to find hte Parzen PFD.
+## Example
+Given the data below, use the kernel function with width h=1 to find the Parzen PFD:
 
-WE are not estimating the global parameters for our data. The parameter h is not estimated from our data, thus non-parametric approach. To get the most optimal h, you have some candidates of h and test how well which h is good at classifying.
+![Image](../../images/quiz.png)
 
-Whether which kernel function works best, that is up to you to experiment
+![Image](../../images/quiz2.png)
 
-The width parameter or h matters. This requires optimization for your specific problem. 
-For the part that overlaps, our threshold determines the decision boundary.
-
-
-### K-nearest-distribution
+# K-nearest-distribution
 Basic idea is to use 'closeness' to classify the data point. Here 'k' is the number of data points to consider.
 
 Locate the cell on the new point x but the cell shape is fixed. do not change the cell shape. Grow the cell untill it covers k objects.
