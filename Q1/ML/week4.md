@@ -73,7 +73,7 @@ Rewriting the linear regression function: (note that the hypothesis class is onl
 
 *Goal: find the best weight vector 'w'*
 
-# Gradient Descent
+## Gradient Descent
 **Gradient descent** helps to find the best weight vector 'w' in linear equation systems with minimum losses (global minimum). 
 
 ![Image](../../images/gradient_descent.PNG)
@@ -118,3 +118,67 @@ To go further, no need to fix the step size. Alternatives are:
 Depending on the cost function (also known as **objective function**) and function class, it is easy or hard to find the global minimum.
 *global minimum is the classifier with the minimal value for the cost function, which may not be the best solution for the problem! Recall: we want the solution to work well for the expected loss
 
+# Logistic regression (classification)
+Objectives in classificiation is different than objectives in regression. In regression, objective is the least difference (risk) while classifications can have serveral:
+- different weight for different mistakes
+- accuracy of probabilities
+- correct ordering of objects
+
+Different goal: find hypothesis function that accurately approximates the probability of the label/class.
+
+![Image](../../images/discrete_hypothesis.PNG)
+
+*If we want class predictions, we have to set a threshold for h(x) at a probability
+
+To map the hypothesis function to a probability in the range [0, 1], we use the **logistic function**, where the z below can be replaced by the hypothesis function and the result is the probability (prediction):
+
+![Image](../../images/logistic_function.PNG)
+
+For 2 classes (assume Y is either 0 or 1) we use **N Bernoulli trials**. 
+
+For object i, the estimated probability of observing label yi is:
+
+![Image](../../images/bernoulli.PNG)
+
+**Likelihood** is a measure of how well the estimated probabilities explain the observed labels, so we want to maximise this likelihood.
+
+Instead of using loss function to find its minimum, we use the **likelihood function** to find its maximum:
+
+![Image](../../images/likelihood_function.PNG)
+
+This is equivalent to finding the minimum of the negative log likelihood (similar to minimizing the 'loss'):
+
+![Image](../../images/negative_log_likelihood.PNG)
+
+Its graph:
+
+![Image](../../images/negative_log_likelihood_graph.PNG)
+
+For linear logistic regression, apply the same hypothesis function from the discrete case:
+
+![Image](../../images/hypothesis_discrete_function2.PNG)
+
+To get the minimum negative log likelihood:
+
+![Image](../../images/negative_log_likelihood_formula.PNG)
+
+*Even if logistic function itself is not linear, the hypothesis function is linear thus **logistic regression** is considered a linear classifier.
+
+## Gradient Descent (again)
+If using negative log likelihood to find the minimum 'loss', we use gradient descent again. Use the following simplification:
+
+![Image](../../images/gradient.PNG)
+
+To turn the negative log likelihood formula below:
+
+![Image](../../images/negative_log_likelihood_formula2.PNG)
+
+into its gradient by performaing derivative:
+
+![Image](../../images/gradient2.PNG)
+
+Pointers
+- no analytical solution, so we use iterative procedures like gradient descent
+- if no class overlap our quality measure is not sufficient: many equally good solutions
+
+# Support vector machines
