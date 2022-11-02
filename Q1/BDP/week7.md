@@ -303,3 +303,63 @@ Some issues:
   - Changing the micro-batch size leads to different results
 
 ## Flink: event-based
+The core of Apache Flink is a distributed streaming data-flow engine written in Java and Scala.
+
+In Flink, a program is first compiled to a **data-flow graph**, which describes how data flows between operations.
+
+Each **node** in the DFG are called **operators** and it represents a task (computation). The operators can be scheduled within a **task manager** (essentially, a JVM instance).
+Each **edge** represents data dependencies.
+
+![Image](../../images/flink_dfg.PNG)
+
+A DFG consists of:
+- **Data Source**: operartion without input ports. A dataflow graph must have at least one data source
+- **Data Sink**: operation without output ports. A dataflow graph must have at least one data source
+
+A sink cannot be a source: this means that 2 Flink computations cannot exchange data directly.
+
+In order to execute a dataflow program, its logical graph (simplified) is converted into a physical dataflow which specifies in detail how the program is executed:
+
+![Image](../../images/flink_physical.PNG)
+
+# Stream archtiectures
+
+The **flink cluster architecture**:
+
+![Image](../../images/flink_cluster.PNG)
+
+The **kafka streams architecture**:
+
+![Image](../../images/kafka_stream.jpg)
+
+# Stateful streaming
+- A **stateless streaming** can be understood in isolation. There is no stored knowledge of or reference to past transactions. Each transaction is made as if from scratch for the first time.
+- A **stateful system** the state is shared between events(stream entities). And therefore past events can influence the way the current events are processed.
+![Image](../../images/stateful_stateless2.png)
+
+Many operators (both windowing and aggregation ones) are inherently stateful:
+
+![Image](../../images/stateful_stateless.png)
+
+If for each item we process we would like to keep a counter, use the **mapWithState** operator.
+
+The **mapWithState** operator takes and returns an optional state, which the stream processor must maintain.
+
+```
+val stream: DataStream[(String, Int)] = ...
+
+val counts: DataStream[(String, Int)] = stream
+  .keyBy(_._1)
+  .mapWithState((in: (String, Int), count: Option[Int]) =>
+    count match {
+      case Some(c) => ( (in._1, c), Some(c + in._2) )
+      case None => ( (in._1, 0), Some(in._2) )
+    })
+```
+
+As the processing graph is distributed, we need a consistent, fault-tolerant global view of the counter
+-> naive approach is to start a 2-phase commit process and restart the processing when all nodes are committed.
+
+Better apropach is **Chandy-Lamport algorithm**
+
+## Chandy-Lamport algorithm
