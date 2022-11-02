@@ -229,4 +229,35 @@ We add this penalty to our risk minimisation of the margin:
 A lRosesg utelramriz watiitohn n Toe drmata?
 
 # Multiclass classification
+Remember for classification there are **generative models** and **discriminative models**:
 
+![Image](../../images/discrminiatve_generative.png)
+
+If there are more than 2 classes:
+- For generative models: model the extra P(X|Y=k)’s
+- Discriminative models have two approaches
+    1. construct a multi-class classifier (algorithm specific adaptation)
+    2. **one-vs-rest** approach (have to deal with ambiguities)
+    3. **one-vs-one** approach (have to deal with ambiguities)
+
+## Multi-class classifier
+Change algorithm to return posterior values for K-class instead of 1.
+
+Example for logistic regression:
+
+![Image](../../images/multiclass_logistic.png)
+
+## Solving ambguity
+- Often, we can adapt the original model from 2 class to K-class, as in the logistic regression
+- classifiers trained jointly to optimize performance on the multiclass problem
+- possible solution, use the decision values rather than predicted labels of the classifiers.
+
+## One-vs-rest
+Train K or K-1 classifiers to discriminate between the class K and all other classes. 2-class classifier for one against the rest
+
+![Image](../../images/one_vs_rest.png)
+
+## multiple 2-class classifiers
+Also called **one-vs-one** approach. Train K/2 or (K-1)/2 classifiers to discriminiate between all pairs of classes. combine multiple 2-class classifiers
+
+![Image](../../images/one_vs_one.png)

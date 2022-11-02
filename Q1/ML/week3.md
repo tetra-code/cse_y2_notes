@@ -1,5 +1,5 @@
 # Non-parametric density estimation
-In real life we don't no distribution
+In real life we don't know distribution
 => can't esimate the global parameters
 
 One way is to use a histogram:
@@ -14,7 +14,7 @@ Other methods than histogram are:
 
 *non-parametric generally more accurate since it gets the average of every data set and don't assume a pre-distribution type
 
-# Parzen density esimate (Kernel density estimation)
+## Parzen density esimate (Kernel density estimation)
 Some terms:
 - **Kernel function**: function that accepts vectors as inputs in original space and returns the dot product of the vectors in feature space.
 - **Window function**: mathematical function that is zero-valued outside of some chosen interval
@@ -61,7 +61,7 @@ Given the data below, use the kernel function with width h=1 to find the Parzen 
 
 ![Image](../../images/quiz2.png)
 
-# K-nearest-distribution
+## K-nearest-distribution
 Basic idea is to use 'closeness' to classify the data point. Here 'k' is the number of data points to consider.
 
 Locate the cell on the new point x but the cell shape is fixed. do not change the cell shape. Grow the cell untill it covers k objects.
@@ -130,14 +130,16 @@ So with the same data set, we can get two different diviosn class
 Problem with naive bayes:
 If the features covary, they aren't indenpendent and naive bayes strong assumes indenpendence.
 
-## Discriminiative classifiers
+# Discriminiative classifiers
 There are 2 types of classifiers
-- gnerative classifiers (parametic densitives, non-parametric densitites)
-- discriminiative classifiers (support vector, decision tree, neural network)
+- **generative classifiers** (parametic densitives, non-parametric densitites)
+- **discriminiative classifiers** (support vector, decision tree, neural network)
+
+![Image](../../images/discrminiatve_generative.png)
 
 Discriminative models draw boundaries in the data space, while generative models try to model how data is placed throughout the space.
 
-![Image](../../images/discrminiatve_generative.png)
+![Image](../../images/classifiers.png)
 
 Small datasets require models that have low complexity (or high bias) to avoid overfitting the model to the data. the simpler the machine learning algorithm, the better it will learn from small data sets. Naive Bayes algorithm is among the simplest classifiers and as a result learns remarkably well from relatively small data sets. 
 
