@@ -134,8 +134,41 @@ A **log-based messaging system** makes use of logging to store message and then 
 
 ![Image](../../images/kafka.PNG)
 
+# Time in stream processing
+In streaming systems, we have two notions of time:
+- **Processing time**: the time at which events are *processed* in the system
+- **Event time**: the time at which events *occurred*
+
+**Event time** has to be derived from the field in event, example : timestamp field.
+
+**Processing time** is determined by the clock on the system processing the element.
+
+If the dataflow can't process the published events in publishing frequency, then the event time will lag behind, so your system latency will increase in your dataflow.
+
+Applications that calculate streaming aggregates (e.g. avg rainfall per country per hour) don’t care much about the event order.
+
+Applications with precise timing requirements (e.g. bank transactions, fraud detection) care about *event* time (not processed time). Events may however enter the system delayed or out of order.
+
+
+## Event time skew
+If processing (wall-clock) time is *t*:
+- **Skew** is calculated t − s, where s is the processed timestamp of the latest event
+- **Lag** is calculated as s - t, where s is the actual timestamp of an event
+
+![Image](../../images/time_skew.PNG)
+
 # Programming models for stream processing
-Processing of events to dervies some form of state
+Processing of events to dervies some form of state.
+
+## Stream as a database
+Stream systems are similar to database systems:
+
+- Events can be filtered and transformed
+- Event streams can be joined with other event streams
+- Event streams can be aggregated (given time constraints)
+- Event streams can be replicated on other hosts for scaling and fault tolerance
+
+Main difference: databases contain state, whereas streams contain state modifications. Therefore, *databases can be updated, while streams can be appended*.
 
 ## Event sourcing and CQS (command query segregation)
 Capture all changes of an application state as a sequence of events. 
@@ -173,17 +206,100 @@ The DataFlow model attempts to explain stream processing in four dimensions:
 
 **Flink** draws inspiration from this.
 
-# Time in stream processing
-In streaming systems, we have two notions of time:
-- **Processing time**: the time at which events are *processed* in the system
-- **Event time**: the time at which events *occurred*
+# Stream processing in four dimensions
+## What: operations on streams
+- **element-wise**: apply function to each individual message (e.g. map or flatmap)
+- **aggregation**: group multiple events together and apply a reduction (e.g. fold or max)
 
-Event time has to be derived from the field in event, example : timestamp field.
+*checkout examples
 
-Processing time is determined by the clock on the system processing the element
+## Where: streaming windows
+**Windows** are static size (e.g., 1000 events) or time-length (e.g., 10 secs) *batches* of data:
 
-If the dataflow can't process the published events in publishing frequency, then the event time will lag behind, so your system latency will increase in your dataflow.
+![Image](../../images/windows.PNG)
 
-Applications that calculate streaming aggregates (e.g. avg rainfall per country per hour) don’t care much about the event order.
+Example:
 
-Applications with precise timing requirements (e.g. bank transactions, fraud detection) care about *event* time (not processed time). Events may however enter the system delayed or out of order.
+```
+// Count number of tweets per user per minute
+tweets.map(t => (t.user_id, 1))
+      .keyBy(x => x._1)
+      .timeWindow(Time.minutes(1))
+      .reduce((a,b) => a._2 + b._2)
+
+// result: every minute produce list of pairs:
+(323, 1)
+(44332, 4)
+(212, 32)
+```
+
+![Image](../../images/windows_example.PNG)
+
+**Session windows** are dynamic size that aggrgate batches of user activity. Session windows end after **session gap** time:
+
+![Image](../../images/session_windows.PNG)
+
+Example:
+
+```
+// Number of clicks per user session
+case class Click(id: Integer, link: String, ...)
+clickStream.map(c => (c.id, 1))
+           .keyBy(x => x._1)
+           .window(EventTimeSessionWindows.withGap(Time.minutes(10)))
+           .sum(1)
+```
+
+![Image](../../images/session_windows_example.PNG)
+
+when using event-time windows:
+- Buffering: Aggregation functions are applied when the window finishes (see When). This means that in-flight events need to be buffered in RAM and spilled to disk.
+- Completeness: Given that *events may arrive out of order*, how can we know that a window is ready to be materialized and what do we do with out of order events?
+
+## When: window triggers
+**Trigger** defines when in processing time the results of a window are materialized / processed. Types of triggers:
+
+- **Per-record triggers** fire after x records in a window have been encountered.
+- **Aligned delay triggers** fire after a specified amount of time has passed across all active windows (aka micro-batching).
+- **Unaligned delay triggers** fire after a specified amount of time has passed after the first event in a single window.
+
+### Watermarks
+*review this later
+
+Event-time processors need to determine when event time has progressed enough so that they can trigger windows. When reprocessing events from storage, a system might process weeks of event-time data in seconds; relying on processing time to trigger windows is not enough.
+
+A **watermark** represents the temporal completeness of an out-of- order data stream. Watermarks flow as part of the data stream and carry a timestamp. The watermark's current value informs a processor that all messages with a lower timestamp have been received.
+
+Watermarks allow late messages to be processed up to a specified amount of (event-time) delay (allowed lateness).
+
+As the watermarks flow through the streaming program, they advance the event time at the operators where they arrive. Whenever an operator advances its event time, it generates a new watermark downstream for its successor operators.
+
+![Image](../../images/watermarks.PNG)
+
+## How: window refinements:
+In certain complex cases, a combination of triggers and watermarks flowing may cause a window to be materialized multiple times. In such cases, we can discard, accumulate or *accumulate and retract* the window results.
+
+# Stream processing system
+Messaging systems move data from producers to consumers, in a scalable and fault-tolerant way. **Stream processing systems** does the actual processing of the moved data.
+
+Approaches to processing streams:
+
+- **micro-batching**: Aggregate data in batches of configurable (processing-time) duration
+- **event-based streaming**: Process events one by one
+
+Event-time systems can emulate micro-batching by setting an aligned delay trigger to keyed window.
+
+## Spark: micro-batching
+Uses **micro-batching architecture**: breaks input data into batches (of x seconds processing time length) and schedules those in the cluster using the exact same mechanisms for fault tolerance as normal RDDs.
+
+![Image](../../images/micro_batching.PNG)
+
+Some issues:
+- Latency:
+  - The micro-batch computation is triggered after the batch times out
+  - Each batch needs to be scheduled, libraries need to be loaded, connections need to be open etc
+- Programming model:
+  - No clean separation of mechanism from business logic
+  - Changing the micro-batch size leads to different results
+
+## Flink: event-based
