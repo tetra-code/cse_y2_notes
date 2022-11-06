@@ -363,3 +363,30 @@ As the processing graph is distributed, we need a consistent, fault-tolerant glo
 Better apropach is **Chandy-Lamport algorithm**
 
 ## Chandy-Lamport algorithm
+Used to capture consistent global snapshots. Models a distributed system as a graph of processes that have input and output channels
+
+From this, the observer builds up a complete snapshot: a saved state for each process and all messages “in the ether” are saved. 
+
+1. **Snapshot initiator** or **observer process** (process taking a snapshot) saves its local state
+2. It sends a **marker** (snapshot request message) along with a snapshot token to all its output channels (other processes)
+3. A process receiving the snapshot token for the first time on any message: 
+  - Sends the **observer process** its own saved local state
+  - Attaches the snapshot token to all outgoing subsequent messages
+4. When a process that has already received the snapshot token receives a message that does not bear the snapshot token:
+  - Forward that message to the observer process (message obviously sent before the snapshot occured)
+5. When the **marker** reaches the **observer process** the snapshot is done
+
+Example of **Flink snapshots**
+
+![Image](../../images/flink_snapshot.png)
+
+## Event processing guarantees
+The following guarantees are offered by streaming systems:
+
+- **At most once**: an event will be processed once if delivered at all
+- **At least once**: in case of failure, an event might flow through a system twice 
+- **Exactly once**: an event flows through a set of operators once
+
+Flink supports exactly once. 
+
+To do so, it requires the source to support event replay on request and the sink to be transactional. Both requirements are satisfied by Apache Kafka.
