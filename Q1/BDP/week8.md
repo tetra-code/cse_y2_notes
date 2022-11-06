@@ -227,3 +227,65 @@ Within a Pregel superstep:
 4. Message passing:
     - If receiving vertex is local: update its message queue
     - Else wrap messages per receiving node and send them in bulk
+
+![Image](../../images/pregel_superstep.png)
+
+## Spark GraphX
+GraphX is a new component in Spark for graphs and graph-parallel computation. It provides a variant of Pregel’s API for developing vertex-centric algorithms.
+
+Pregel API in Spark:
+```
+def pregel[A](
+    // Initialization message
+    initialMsg: A,
+    // Max super steps
+    maxIter: Int = Int.MaxValue,
+    activeDir: EdgeDirection = EdgeDirection.Out,
+    // Program to update the vertex
+    vprog: (VertexId, VD, A) => VD,
+    // Program to determine edges to send a message to
+    sendMsg: EdgeTriplet[VD, ED] => Iterator[(VertexId, A)],
+    // Program to combine incoming messages
+    mergeMsg: (A, A) => A
+) : Graph[V, E]
+```
+
+
+Spark uses its underlying fault tolerance, check pointing, partitioning and communication mechanisms to store the graph. Halting is determined by examining if the vertex is sending / receiving messages.
+
+GraphX allows for operating on the underlying data structures as both:
+- graph using graph concepts and processing primitives
+- separate collections of edges and vertices that can be transformed using fp primitives
+
+```
+class Graph[VD, ED] {
+  val vertices: VertexRDD[VD]
+  val edges: EdgeRDD[ED]
+  . . .
+}
+```
+
+PageRank with Spark:
+```
+val pagerankGraph: Graph[Double, Double] = graph
+  .mapVertices((id, attr) => 1.0) // Initial Pagerank for nodes
+
+def vertexProgram(id: VertexId, attr: Double, msgSum: Double): Double =
+  resetProb + (1.0 - resetProb) * msgSum
+def sendMessage(id: VertexId, edge: EdgeTriplet[Double, Double]): Iterator[(VertexId, Double)] =
+  Iterator((edge.dstId, edge.srcAttr * edge.attr))
+def messageCombiner(a: Double, b: Double): Double = a + b
+val initialMessage = 0.0
+
+// Execute Pregel for a fixed number of iterations.
+Pregel(pagerankGraph, initialMessage, numIter)(
+  vertexProgram, sendMessage, messageCombiner)
+```
+
+To guarantee fault tolerance:
+- Periodically, the leader instructs the workers to save the state of their in-memory data to persistent storage
+- Worker failure detected through **keep-alive messages** the leader issues to workers
+- In case of failure, the leader reassigns graph partitions to live workers; they reload their partition state from the most recently available checkpoint
+
+## Data pipeline for graph processing
+![Image](../../images/graph_processing.png)
