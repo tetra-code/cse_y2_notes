@@ -48,7 +48,7 @@ Never assume the following always holds in distributed systems. Fallacies of dis
 - Bandwidth is infinite
 - Topology doesn't change
 - Transport cost is zero 
-- Network is homogenous
+- Network is homogenous: all the nodes in the network have the same function in the 
 
 # Networks
 Network systems can be divided into two types in terms of execution order:
@@ -121,13 +121,13 @@ If some event possibly causes another event, then the first event happened-befor
 
 Order is a way of arranging items in a set so that the following properties are maintained. Two types of order:
 
-- **strict total order**
-
-![Image](../../images/strict_total_order.PNG)
-
-- **strict partial order**
+- **strict partial order**: any relation that is reflexive, antisymmetric, and transitive
 
 ![Image](../../images/strict_partial_order.PNG)
+
+- **strict total order**: partial order in which every element of the set is comparable with every other element of the set.
+
+![Image](../../images/strict_total_order.PNG)
 
 Partial order explains how sometimes events happen with no possible causal relationship i.e. not (A -> B or B -> A).
 
@@ -188,10 +188,10 @@ For two events a and b, *if a → b, then LT(a) < LT(b)*. But the same does *not
 # Vector clocks
 **Vector clocks** are used to maintain causal order.
 
-For a system with N nodes, each node i has its own vector Vi of size N.
-
-Vi[i] is the number of events that occurred at node i
-Vi[j] is the number of events that node i knows occurred at node j
+For a system with N nodes:
+- each node i has its own vector clock Vi of size N
+- Vi[i] is the number of events that occurred at node i
+- Vi[j] is the number of events that node i knows occurred at node j
 
 How vector clocks are updated:
 - Local events increment Vi[i]
@@ -268,7 +268,7 @@ The two generals problem setting:
 
 ![Image](../../images/two_generals.PNG)
 
-This makes the generals of A1 and A2 impossible to sync their time of attack. Of course in real life this can be (partially) solved using randomization, timeouts, partial synchrony.
+This makes the generals of A1 and A2 impossible to sync their time of attack. Of course in real life this can be (partially) solved using randomization, timeouts, partial synchronization.
 
 ## Byzantine generals problem
 In real life nodes can not only be faulty but can also be malicious. They are called **byzantine nodes**.
@@ -366,9 +366,3 @@ About the below visual:
 ![Image](../../images/log_replication.PNG)
 
 Assum from above that the leader appends commit at index 9 and then crash without replicate. In that case only middle node can be leader since it has the hightest index out of the other candidates. 
-
-## Distrubted database
-For sync, if another operation in the queue, need to wait until the current one is done for ALL the followers.
-For asyn if leader goes down, no way of knowing which nodes successed and which ones failed. In addition all nodes not guaranteed to have same consistent state since each process and finish time can be different and can have different states at a given point.
-
-Hybrid async and sync: 

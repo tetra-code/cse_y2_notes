@@ -23,11 +23,11 @@ RDD properties:
 - immutable
 - reside mostly in memory (fast)
 - transparently distributed
-- features alL FP programming primities
+- features all FP primities
 
 How spark uses RDD:
 1. create spark context (sc)
-2. this into a RDD
+2. convert this into a RDD
 3. use this RDD to apply functional programming. 
 
 To create an RDD:
@@ -47,7 +47,7 @@ val rdd: RDD[Int] = sc.parallelize(xs)
 rdd.map(x => x.toString) //returns an RDD[String]
 ```
 
-Two types of oeprations in RDD:
+Two types of operations in RDD:
 - **Transformation**: Applying a function that returns a new RDD. They are lazy. 
 - **Action**: Request the computation of a result. They are eager.
 
@@ -57,7 +57,7 @@ With transform, we create new RDDs but it is not like a new RDD on top of anothe
 
 Before action, we create a pipeline. With action, we actually perform the computation (lazy)
 
-In Scala, lists are eager but in RDD is lazy by default:
+In Scala, lists are eager but in RDD lists are lazy by default:
 ```
 // This just sets up the pipeline
 val result = rdd
@@ -335,7 +335,7 @@ val result = sc.textFile("sample.txt")
   .sortBy(_._1)
 ```
 
-When a job requires wide dependencies (e.g. groupByKey or sort), it is called a **Stage**. the **Spark scheduler** reshuffles the data and this creates a new stage. Stages are always executed serially and each stage conssits of one or more **tasks**.
+When a job requires wide dependencies (e.g. groupByKey or sort), it is called a **Stage**. the **Spark scheduler** reshuffles the data and this creates a new stage. Stages are always executed serially and each stage consists of one or more **tasks**.
 
 ![Image](../../images/job_graph.png)
 
@@ -724,13 +724,12 @@ The new, optimized code is compiled at *runtime* (not compile time) to JVM code
 *Conclusion: when in doubt, provide a schema!*
 
 ### Catalyst Optimizer process:
-
 Catalyst performs the following steps:
 
-    Analysis, to get to know the types of column expressions. This will, e.g. resolve UnresolvedAttribute("team_size") to Attribute("team_size") of type Int(and would also check whether team_size exists in df)
-    Rule optimization, as described above
-    Physical optimization, to minimize data movement
-    Code generation, as described before
+1. Analysis: to get to know the types of column expressions.
+2. Rule optimization
+3. Physical optimization
+4. Code generation
 
 The end result is native code that runs in optimal locations on top of an RDD.
 

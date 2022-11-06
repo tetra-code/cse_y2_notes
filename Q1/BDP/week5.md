@@ -160,11 +160,13 @@ The **CAP theorem** states that in a replicated system it is impossible to get a
 - Availability: Every request to a non-failing replica receives a response
 - Partition tolerance: The system continues to operate even if component or network faults
 
-Synchronous replication: Strong consistency but not always available
-Data not always available in case a failure of any replicas.
+Synchronous replication: 
+- Strong consistency but not always available
+- Data not always available in case a failure of any replicas.
 
-Asynchronous replication: Always available but not strong consistency
-Replicas may not have up to date data.
+Asynchronous replication: 
+- Always available but not strong consistency
+- Replicas may not have up to date data.
 
 *Trade-off is not “Availability vs Consistency” but “Availability vs Strong Consistency”*
 
@@ -183,7 +185,7 @@ It answers questions such as:
 
 **Strong consistency** means maintaining the illusion of a single copy. These models trade off availability for strong consistency. Focuses on *total order*
 
-Two main types of weak consistency models:
+Two main types of strong consistency models:
 - Sequential consistency
 - Linearizable consisntency
 
@@ -371,22 +373,26 @@ Terms to know to understand GFS:
 - **Write**: erase what was previously on the file
 - **Append**: add new information to the end of the file 
 
-append completes atomically *at least once*. Remember in distributed systems no guarantee of exactly once.
+**Append** completes atomically *at least once*. Remember in distributed systems no guarantee of exactly once.
 
 ![Image](../../images/gfs_consistency_model.PNG)
 
-*Scenario 1: failed concurrent record append that could result in undefined and inconsistent regions*
-If a replica failed to acknowledge the mutation, it may not have performed it. In that case when the client retries the append, this replica will have to add padding in place of the missing data, so that the record can be written at the right offset. So one replica will have padding while other will have the previously written record in this region.
+*Scenario 1: failed concurrent record append that could result in undefined and inconsistent regions*.
 
-*Scenario 2: successful concurrent record append that could result in record duplication, defined but inconsistent*
-If a record append fails at any replica, the client retries the operation. As a result, replicas of the same chunk may contain different data possibly including duplicates of the same record in whole or in part.
+  If a replica failed to acknowledge the mutation, it may not have performed it. In that case when the client retries the append, this replica will have to add padding in place of the missing data, so that the record can be written at the right offset. So one replica will have padding while other will have the previously written record in this region.
+
+*Scenario 2: successful concurrent record append that could result in record duplication, defined but inconsistent*.
+
+  If a previous record append failed at any replica, the client retries the operation. As a result, replicas of the same chunk may contain different data possibly including duplicates of the same record in whole or in part.
 -> any failure on a replica (e.g. timeout) will cause a duplicate record on the other replicas. This can happen without concurrent writes.
 
-*Scenario 3: failed concurrent writes that could result in undefined and inconsistency*
-A failed write can cause an inconsistent region. 
+*Scenario 3: failed concurrent writes that could result in undefined and inconsistency*.
 
-*Scenario 4: successful concurrent writes that could result in consistent but undefined*
-More interestingly, successful concurrent writes can cause consistent but undefined regions. If a write by the application is large or straddles a chunk boundary, GFS client code breaks it down into multiple write operations. They may be interleaved with and overwritten by concurrent operations from other clients. Therefore, the shared file region may end up containing fragments from different clients, although the replicas will be identical because the individual operations are completed successfully in the same order on all replicas. This leaves the file region in consistent but undefined state.
+  A failed write can cause an inconsistent region. 
+
+*Scenario 4: successful concurrent writes that could result in consistent but undefined*.
+
+  More interestingly, successful concurrent writes can cause consistent but undefined regions. If a write by the application is large or straddles a chunk boundary, GFS client code breaks it down into multiple write operations. They may be interleaved with and overwritten by concurrent operations from other clients. Therefore, the shared file region may end up containing fragments from different clients, although the replicas will be identical because the individual operations are completed successfully in the same order on all replicas. This leaves the file region in consistent but undefined state.
 
 ## HDFS - Hadoop Distributed File System
 HDFS is similar to GFS but some differences:
@@ -427,7 +433,7 @@ reduce((K2, List[V2])): List[(K3, V3)]
 
 ## Hadoop Map/Reduce
 
-![Image](../../images/hadoop_map_reduce.png)
+![Image](../../images/hadoop_map_reduce.jpg)
 
 The above model is fault tolerant but lacks performance:
 - Before each Map and Reduce phase, there are these shuffling and iterative writes; significant latency
