@@ -27,15 +27,15 @@ To train and test, divide data into *training set* and *test set*
 Since test set is an i.i.d (independent and identically distributed) sample from a data set, it generally gives a good estimate of the performance.
 
 Types of machine learning:
-- *supervised learning*: classification, regression - label exists
+- **supervised learning**: classification, regression - label exists
 
 ![image](../../images/supervised_learning.PNG)
 
-- *unsupervised learning*: dimensionality reduction, clustering - no output label is given
+- **unsupervised learning**: dimensionality reduction, clustering - no output label is given
 
 ![image](../../images/unsupervised_learning.PNG)
 
-- *reinforcement learning*: selecting optimal actions
+- **reinforcement learning**: selecting optimal actions
 
 *for this course the focus is supervised and unsupervised learning
 
@@ -78,3 +78,14 @@ and be correct as often as possible. (See bias-variance tradeoff for prediction 
 Prediction doesn't revolve around establishing the most accurate relation between the input and the output, accurate prediction cares about putting new observations into the right class as often as possible.
 
 Given a set of passenger data for a single passenger the inference approach gives you a probability of surviving, the classifier gives you a choice between lives or dies. 
+
+# Discriminiative classifiers
+Within **supervised classification** there are 2 types of classifiers
+- **generative classifiers**: model how data is placed throughout the space 
+- **discriminiative classifiers**:  draw boundaries in the data space
+
+![Image](../../images/discrminiatve_generative.png)
+
+Discriminative models draw boundaries in the data space, while generative models try to model how data is placed throughout the space.
+
+![Image](../../images/classifiers.png)

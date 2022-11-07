@@ -41,7 +41,7 @@ Properties:
 
 The parameter (width) h is NOT estimated from our data, thus it is a non-parametric approach
 
-## Kernel function
+### Kernel function
 For a kernel function K, the following should hold:
 
 ![Image](../../images/kernel_function2.png)
@@ -54,28 +54,44 @@ Several cell shapes to choose from:
 
 KDE with a box kernel is not the same as histogram: with a KDE with box kernel, you can count all the boxes and determine how many data points, while histogram doesn't represent the # of data points just by looking at the bin.
 
-## Example
+Exaple:
+
 Given the data below, use the kernel function with width h=1 to find the Parzen PFD:
 
 ![Image](../../images/quiz.png)
 
 ![Image](../../images/quiz2.png)
 
-## K-nearest-distribution
-Basic idea is to use 'closeness' to classify the data point. Here 'k' is the number of data points to consider.
+## K-nearest-neighbor
+Basic idea is to use 'closeness' to classify the data point. 
 
-Locate the cell on the new point x but the cell shape is fixed. do not change the cell shape. Grow the cell untill it covers k objects.
+*Here 'k' is the number of data points to consider.*
 
-Give training examples {xi, yi}:
-- xi attribute - value representation of examples
-- yi class label - ex apple, 0, 1, etc
-- testing point x that we want to classify
+How it works:
+1. Locate the cell on the new point
+2. Do not change the cell shape
+3. Grow the cell untill it covers k objects.
+
+![Image](../../images/k_nn.png)
+
+
+![Image](../../images/k_nn_1.png)
+
+- *𝑉𝑘* is the volume of the sphere centered at point x 𝑥
+- *ki* is the number of neighbours of class i within Vk
+- *ni* is the number of data points of class i in the dataset
+
+When classifying:
+
+![Image](../../images/bayes.png)
+
 - The algorithm:
 1. compute distance D(x, xi) to EVERY training example xi
 2. Select k closest instances xi - xk and their labels y1 - yk
-3. output class y which is most frequent within the y1 - yk (majority vote)
+3. output class y which is most frequent within the yi1 - yik (majority vote)
 
-If k = all the x values (whole data set), we are basically looking at class priors (everything classified as the most probablye class)
+If k = all the x values (whole data set), we are basically looking at class priors (everything classified as the most probable class)
+
 If k = 1, highly variable and result in unstable decision boundaries (any noise will have consequences)
 
 To determine the right value of k is similar to choosing the right value of h from *kernel density estimation*:
@@ -91,74 +107,174 @@ If we have equal number of positive/negative neighbours:
 
 To measure the distance:
 - Euclidean (numeric features)
+
+![Image](../../images/euclidean.png)
+
 - manhattan distance
 - hamming distance (categorical features)
 
-Feature scaling is scaling all your features into a certain range. This is necessary as it might make your boudnary decision more easier to look.
+**Feature scaling** is scaling all your features into a certain range. This is necessary as it might make your boudnary decision more easier to look.
 
-pros and cons:
+![Image](../../images/feature_scaling.png)
+
+Pros:
+- simple, flexible classifiers
+- often good performance
+- simple to adapt complexity of classifier
+
+Cons:
+- Relatively large training sets needed
+- Complete training set has to be stored
+- Compute distance to all training objects
+- 'Right' features caling
+- Optimize 'k' value
 
 ## Naive Bayes Classifiers
+To get the pdf P(X) we need to do the following:
 
-(recap)
+![Image](../../images/px.png)
 
-*curse of dimensionality*
-When estimating a class conditional probability density, each feature vector x has many features. To estimate this joint pdf, we need lots of data
+When estimating a class conditional probability density, each feature vector x can have many features. Estimating this **joint pdf** requires lots of data (**curse of dimensionality**).
 
-In *Naive Bayes* we avoid the curse of dimensionality by strongly assuming that ALL features are INDEPENDENT. This allows us to multiply the probabilities of each feature and this will give us the class conditional probability density:
+**Naive Bayes** assumption: each feature is *independent* of each other. This allows us to multiply the probabilities of each feature:
 
-𝑝 𝑥 𝑦 = 𝑝 𝑥1, 𝑥2, 𝑥3, 𝑥4, ... , 𝑥𝑑|𝑦 = ෑ𝑖=1
-𝑑
-𝑝 𝑥𝑖 𝑦
-= 𝑝 𝑥1 𝑦 𝑝 𝑥2 𝑦 ... 𝑝(𝑥𝑑|𝑦
+![Image](../../images/naive_bayes.png)
 
-For example:
-We assume conditional independence of two variables (both features) given a third variable (the class)
+*The class value explains all the dependence between each features*.
 
-Example: probablity of going to the beach and having a heartstroke may be
-independent if we know the wheather is hot
-𝑝 𝐵, 𝑆|𝐻 = 𝑝 𝐵|𝐻 𝑝 𝑆 𝐻
-• Hot weather “explains” all the dependence between beach and heartstroke
-• In classification: class value explains all the dependence between features
+Can use three main models:
+- Gaussian
+- Multinomial
+- Bernouli
 
-Navie bayes clasifier can be used in both: use parametric density function (bayes theorem to calculate the parameters) or use non-parametric density function. 
+Navie bayes clasifier can be used in both:
+- parametric density function (bayes theorem to calculate the parameters) 
+- non-parametric density function. 
 
-So with the same data set, we can get two different diviosn class
+*So with the same data set, we can get two different division of class*
 
-(read up on continuous data example)
+Pros:
+- Dataset can be small and still good performance
+- relatively fast and simple
 
-Problem with naive bayes:
-If the features covary, they aren't indenpendent and naive bayes strong assumes indenpendence.
+Cons:
+- If features covary, they aren't independent 
+- **Zero-Frequency problem**: If an instance in the test data set has a category that was not present during training, then it will assign zero probability.
 
-# Discriminiative classifiers
-There are 2 types of classifiers
-- **generative classifiers** (parametic densitives, non-parametric densitites)
-- **discriminiative classifiers** (support vector, decision tree, neural network)
+Solution to zero-frequency problem is **Laplace smoothing**: adding a small positive number to the counts:
 
-![Image](../../images/discrminiatve_generative.png)
+![Image](../../images/laplace.png)
 
-Discriminative models draw boundaries in the data space, while generative models try to model how data is placed throughout the space.
-
-![Image](../../images/classifiers.png)
-
-Small datasets require models that have low complexity (or high bias) to avoid overfitting the model to the data. the simpler the machine learning algorithm, the better it will learn from small data sets. Naive Bayes algorithm is among the simplest classifiers and as a result learns remarkably well from relatively small data sets. 
-
-For very small datasets, Bayesian methods are generally the best in class, although the results can be sensitive to your choice of prior. I think that the naive Bayes classifier and ridge regression are the best predictive model
-
-Small datasets, you need models that have few parameters (low complexity) and/or a strong prior. You can also interpret the “prior” as an assumption you can make on how the data behaves.
-
-Misclassification cost, 
+Gaussian density classifiers problem: not enough training data
 
 
-NEed independent data (data not used in training).Assume random subset of the data in the graph and another random subset are independent. But doesn't sometimes hold, when time is a factor(frame based detection in video, and all these deep detection algorithms fail). SO make sure you use different types of videos for testing, not just a few ones
+# Classifier evaluation
+Questions is what classifier to use?
+
+Naive approach: pick several classifiers and choose one with least **error estimate**.
+
+Once you have chosen a classifer, use the whole design set to train the classifier on the whole design set. Now this is no longer testable but this cross-validation has given some confidence that you made right choice in choosing classifier. 
+
+Problems:
+- Assume that the training set is a fair sample from true problem (don't know for sure)
+- overfitting on the training set, thus not ready for new samples
+- Sometimes classification error is not the real useful thing (cost of missing classifying a covid case is much higher than simply counting it as one error) -> redefine what the error actually is
 
 
+Very important which feature you choose so that it represents a true distribution type in real life. 
 
-When selecting your object features, it is very important which feature you choose so that 
-it represents a true distribution type in real life. If you had a model that can detect well certain object A but then started introducing only 'outliers' in the training data set, it is very likely that your model will become worse at predicting, because only ourlier filled training data set is not a true representation of the distribution of real life occurences.
+If you had a model that can detect well certain object A but then started introducing only 'outliers' in the training data set, it is very likely that your model will become worse at predictin -> only outlier filled training data set is not a true representation of the distribution of real life occurences.
 
-## ML learning curve
-As size of the training set increases, the classification error also increases. But this isn't linear. At some point, the more data you have the more likely it will truly represent the distriution type of real life occurence for that object 
+Small datasets require models that have:
+- low complexity (few parameters) or high bias to avoid overfitting the model to the data
+- simple the machine learning algorithm
+- example is Naive bayes and Ridge regression
+
+# Error estimate by test set
+With a single **design set**, we divide it up into **training set** and **test set**:
+
+![Image](../../images/design_set.png)
+
+*changing training set changes the classifier and changing the testing set changes the error estimate*
+
+To calculate the error: sum of Bernoulli random variables over N test set size:
+
+![Image](../../images/error_estimate.png)
+
+To compute the variance of the error estimate, do the following equation where epsilon is the true error:
+
+![Image](../../images/variance.png)
+
+*If N is not large enough, variance can get very big*
+
+- Large training set -> good classifiers
+- Large test set -> reliable, unbiased error estimate
+
+Four naive cases:
+- Same set for training and testing: good classifier but biased error estimate
+- Small, independent test set: well trained classifier, unbiased but unreliable (large variance)
+- Large, independent test set: badly trained classifier, unbiased and reliable (small variance)
+- 50-50: The optimal balance
+
+More better approaches use **cross-validation**:
+
+## Bootstrapping
+1. Randomly draw N objects from design set of size N (with replacement)
+2. Use never-drawn objects while bootstrapping as testing set
+3. Repeat m times and get m error estimates
+4. average the m error estimates to get final error estimate
+
+![Image](../../images/bootstrapping.png)
+
+Potential problems
+- design set already randomly drawn
+- get same train objects several times
+
+## K-fold cross validation
+1. Divide the design set in *K* parts
+2. Use K-1 parts for trainuing set and 1 for testing set
+3. Rotate this K times for the other parts and get K error estimates
+4. Average the K error estimates and get final error estimate
+
+![Image](../../images/k_fold.png)
+
+## Leave-one-out procedure
+1. Divide the design set into a training set and testing set
+2. Divide the testing set further into N objects
+3. Rotate N times for each test object and get N error estimates
+4. Average the N error estiamtes to get final error estimate
+
+![Image](../../images/leave_one_out.png)
+
+## Double cross-validation: Optimizing hyper parameters
+Machine learning methods often have **hyperparameters**. Some examples:
+- Parzen density estimator: width parameter h
+- k-nearest neighbour: number of neighbours k
+- Decision trees: pruning method, stopping criterion
+- Neural networks: architecture, learning rate, …
+
+If you optimize the hyperparameters by looking at the test set performance, this will lead to overfitting (no more data to test whether this hyperparameter really is best choice)
+
+**Double cross-validation** is doing cross-validation inside another cross-validation:
+1. For each training set from different sessions, rename it to **validation set**
+2. Split the **validation set** into separate training and testing set to vary the hyper parameter.
+3. Get separate error estimate Eij for different training sets within internal cross-validation
+4. Choose hyperparameter with the lowest average:
+
+![Image](../../images/cross_validation.png)
+
+*the error estimate from the interval cross-validaiton is separate from the external cross-validation*
+
+# ML learning curve
+As size of the training set increases, the estimate error (from training set) also increases. But this isn't linear; more data you havem, the more true error will decrease (more likely it represent the distriution type of real life occurence for that object). 
+
+**Overfitting** is when the difference between true error and the estimate error is too big:
+
+![Image](../../images/learning_curve.png)
+
+Different classifiers have different complexity. The more flexible the classifier is, it is good for large data set but bad for small data set.
+
+
 
 *Bayes error* is smaller than the asympototic error - bayes eror assuems ideal distribution
 
