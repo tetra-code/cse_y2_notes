@@ -266,17 +266,114 @@ If you optimize the hyperparameters by looking at the test set performance, this
 *the error estimate from the interval cross-validaiton is separate from the external cross-validation*
 
 # ML learning curve
-As size of the training set increases, the estimate error (from training set) also increases. But this isn't linear; more data you havem, the more true error will decrease (more likely it represent the distriution type of real life occurence for that object). 
+As size of the training set increases, the estimate error (from training set) also increases -> lot of data means classifier will find problematic cases where it can't perfectly predict all the labels
+
+But this isn't linear; more data you have, the more true error will decrease (more likely it represent the distriution type of real life occurence for that object). 
 
 **Overfitting** is when the difference between true error and the estimate error is too big:
 
 ![Image](../../images/learning_curve.png)
 
-Different classifiers have different complexity. The more flexible the classifier is, it is good for large data set but bad for small data set.
+Different classifiers have different complexity. More flexible (more complex and more parameters) classifiers perform well with large data set but bad for small data set -> NO best classifier because it depends on how much training data you have.
+
+## Parzen example
+Below shows parzen density estimate classifier with a very small width parameter. Zero error from training set:
+
+![Image](../../images/parzen.png)
+
+Now this is when the width parameter is very big. Classifier becomes more simple but more errors in training set:
+
+![Image](../../images/parzen_big.png)
+
+*Increase the parameter (decrease complexity) just enough so that training and testing error goes up but overfitting is less*
+
+![Image](../../images/complexity.png)
+
+# Bias-variance tradeoff
+When given some data, almost never know what the true distribution of the data set is.
+
+- **Variance** is how much classifier g(x) vary over different training sets.
+- **Bias** is how much the average classifier g(x) differ from the true output.
+
+Consider the squared error where g(x;D) is the classifier from the avveraged training sets and E[y|x] is the **optimal mean-squared regressor**:
+
+![Image](../../images/squared_error.png)
+
+![Image](../../images/calculation3.png)
+
+![Image](../../images/calculation2.png)
+
+Final result:
+
+![Image](../../images/calculation_result.png)
+
+More simple classifiers:
+- less parameters
+- less flexible
+- more stable
+- require relatively small data
 
 
+More complex classifiers
+- more parameters
+- more flexible
+- less stable
+- require large data
 
-*Bayes error* is smaller than the asympototic error - bayes eror assuems ideal distribution
+LDA vs kNN;
 
-## Bias variance tradeoff
-When given some data, we could get unlucky and get a-typical data. TO say something gneral, we need to average over different training sets. 
+![Image](../../images/lda_knn.png)
+
+**Curse of dimensionality**: as number of parameters increase (more complex), the number of samples needed grows exponentially:
+
+![Image](../../images/feature_curve.png)
+
+*If a classifier has too few features (too simplified), has low variance but large bias*
+
+*If a classifier has too many features (too complex), has low bias but large variance.*
+
+![Image](../../images/feature_curve_2.png)
+
+But the more training data we have, the more possibilities of estimating the parameters well and can flatten the curve on the rhs:
+
+![Image](../../images/flatten_curve.png)
+
+# Confusion matrices
+**Confusion matrices** provides a detailed count of classifying error for each class. 
+
+![Image](../../images/confusion_matrix.png)
+
+Example to calculate separate classification error for each class:
+
+    misclassified objects from class A / # objects from class A
+
+![Image](../../images/confusion_matrix_example.png)
+
+## ROC analysis
+Once you have confusion matrix, make a trade off to determine how many errors for one class and how many errors for the other.
+
+Below is the **ROC analysis** that demonstrates all possible trade offs for a specific classifier in this curve:
+
+![Image](../../images/roc_analysis.png)
+
+Below, error on class 1 is high but error on class 2 is vritually 0:
+
+![Image](../../images/roc_curve.png)
+
+![Image](../../images/roc_curve_2.png)
+
+Below if class 1 prior is high, it means the class 1 error is much heavier than class 2 error for the total error estimate. 
+
+Thus in this setting, if you go in -> direction (direction of class 1 error) the final error grows larger than when you go <- direction (direction of class 2 error):
+
+![Image](../../images/roc_curve_3.png)
+
+Example: compute the ROC curve for the following data set
+
+![Image](../../images/roc_example.png)
+
+![Image](../../images/roc_example_2.png)
+
+See the correspondence from above and below picture
+
+![Image](../../images/roc_example_3.png)
