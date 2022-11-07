@@ -152,8 +152,8 @@ Applications with precise timing requirements (e.g. bank transactions, fraud det
 
 ## Event time skew
 If processing (wall-clock) time is *t*:
-- **Skew** is calculated t − s, where s is the processed timestamp of the latest event
-- **Lag** is calculated as s - t, where s is the actual timestamp of an event
+- **Skew**: difference in the actual event time and expected ideal event time
+- **Lag**: difference in the actual processing time and ideal processing time
 
 ![Image](../../images/time_skew.PNG)
 
@@ -314,7 +314,7 @@ Each **edge** represents data dependencies.
 
 A DFG consists of:
 - **Data Source**: operartion without input ports. A dataflow graph must have at least one data source
-- **Data Sink**: operation without output ports. A dataflow graph must have at least one data source
+- **Data Sink**: operation without output ports. A dataflow graph must have at least one data sink
 
 A sink cannot be a source: this means that 2 Flink computations cannot exchange data directly.
 
@@ -334,7 +334,7 @@ The **kafka streams architecture**:
 
 # Stateful streaming
 - A **stateless streaming** can be understood in isolation. There is no stored knowledge of or reference to past transactions. Each transaction is made as if from scratch for the first time.
-- A **stateful system** the state is shared between events(stream entities). And therefore past events can influence the way the current events are processed.
+- A **stateful streaming** the state is shared between events(stream entities). And therefore past events can influence the way the current events are processed.
 ![Image](../../images/stateful_stateless2.png)
 
 Many operators (both windowing and aggregation ones) are inherently stateful:
@@ -368,17 +368,19 @@ Used to capture consistent global snapshots. Models a distributed system as a gr
 From this, the observer builds up a complete snapshot: a saved state for each process and all messages “in the ether” are saved. 
 
 1. **Snapshot initiator** or **observer process** (process taking a snapshot) saves its local state
-2. It sends a **marker** (snapshot request message) along with a snapshot token to all its output channels (other processes)
+2. It sends a **epoch marker** or simply **marker** (snapshot request message) along with a snapshot token to all its output channels (other processes)
 3. A process receiving the snapshot token for the first time on any message: 
   - Sends the **observer process** its own saved local state
   - Attaches the snapshot token to all outgoing subsequent messages
 4. When a process that has already received the snapshot token receives a message that does not bear the snapshot token:
   - Forward that message to the observer process (message obviously sent before the snapshot occured)
-5. When the **marker** reaches the **observer process** the snapshot is done
+5. When the **observer process** receives the same **marker** from all channels, all the states for all operators are saved into a single global consistent snapshot.
 
-Example of **Flink snapshots**
+Example of Flink snapshots:
 
 ![Image](../../images/flink_snapshot.png)
+
+*Operators wait for the same epoch markers from all channels before they take a snapshot.
 
 ## Event processing guarantees
 The following guarantees are offered by streaming systems:
