@@ -40,7 +40,7 @@ Suppose we want to estimate p(w|x).
 
 ![image](../../images/gaussian_data_graph.PNG)
 
-Caclulate posterior probability using Bayes theorem. Assign the label of the class that has the largest posterior probability.
+Calculate posterior probability using Bayes theorem. Assign the label of the class that has the largest posterior probability.
 
 - If p(w1|x) > p(w2|x) or p(x|w1)p(w1) > p(x|w2)p(w2) assign feature x with w1. 
 - If p(w1|x) < p(w2|x) or p(x|w1)p(w1) < p(x|w2)p(w2), assign feature x with w2. 
@@ -295,16 +295,16 @@ If no inverse for some covariance matrix, average over all covariance matrices:
 
 ![image](../../images/covariance_avg.png)
 
-For high-dimensional data, need many sampels to estimate covariance matrix. Can also assume all classes have the same convariance matrix. For a posterior probability for one class:
+For high-dimensional data, need many samples to estimate covariance matrix. Can also assume all classes have the same convariance matrix. For a posterior probability for one class:
 
 ![image](../../images/covariance_avg2.png)
 
 ![image](../../images/covariance_result.png)
 
-Notice how covariance matrix is not class specific (averaged covariacne matrix)
+Notice how covariance matrix is not class specific (averaged covariance matrix)
 
 ## Nearest mean classifier
-**Nearest mean classifier** is ued when full averaged covariance matrix is too much to estimate. 
+**Nearest mean classifier** is used when full averaged covariance matrix is too much to estimate. 
 
 - measurement from each class are normally distributed
 - separate mean per class
@@ -338,6 +338,6 @@ The general form for a two-class nearest mean classifier results in a linear cla
 - For now ignore **mixture models**: combination of separate gaussian distributions with separate weights
 - With increasing dimensions / # measurements, does Gaussian or histogram need more data? -> histogram
 
-For histogram ou can have any distribution so as it increases, need more parameters.
+For histogram you can have any distribution so as it increases, need more parameters.
 
-Gaussian is already a normal distruiont so only need mean and covariacnce matrix.
+Gaussian is already a normal distribution so only need mean and covariance matrix.

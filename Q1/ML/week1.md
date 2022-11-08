@@ -4,11 +4,11 @@
 
 "No Free Lunch" theorem - no best learning algorithm for all problems. Different problems have different approaches/algorithms that work best
 
-Identify regularies in the world by learning from data (examples). The model should work beyond the specific examples it has been given. Machine learning exists because many tasks are too complicated to explicitely code. It is easier to map from input to output using examples. Because it learns about the world using data, strong connection to statistics, signal processing, and optimisation.
+Identify regularies in the world by learning from data (examples). The model should work beyond the specific examples it has been given. Machine learning exists because many tasks are too complicated to explicitely code.
 
 The goal of machine learning is:
 - create a model, a mapping from inputs to outputs
-- calculate the exepcted loss, how bad the model is on average
+- calculate the expected loss, how bad the model is on average
 
 ![image](../../images/ml_process.PNG)
 
@@ -24,7 +24,7 @@ To train and test, divide data into *training set* and *test set*
 1. Use traning set to fit the model
 2. Evaluate performance on the test set
 
-Since test set is an i.i.d (independent and identically distributed) sample from a data set, it generally gives a good estimate of the performance.
+Since test set is an i.i.d (independent and identically distributed) sample from a data set, it generally gives a good estimate of he performance.
 
 Types of machine learning:
 - **supervised learning**: classification, regression - label exists

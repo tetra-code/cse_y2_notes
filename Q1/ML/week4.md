@@ -1,5 +1,5 @@
 # Empirical risk minimization
-Core idea: don't know how well an algorithm will perform in practice (the *true risk*) since we don't know the true distribution of data that the algorithm will work on. Thus measure its performance on a known set of training dtat (the *empirical risk*).
+Core idea: don't know how well an algorithm will perform in practice (the *true risk*) since we don't know the true distribution of data that the algorithm will work on. Thus measure its performance on a known set of training data (the *empirical risk*).
 
 Generally true risk can't be computed since distribution of variable x is unknown. Therefore compute an approximate of the risk called **empirical risk**:
 
@@ -225,8 +225,6 @@ If the data is not linearly separable like below, penalize how far the object is
 We add this penalty to our risk minimisation of the margin:
 
 ![Image](../../images/soft_margin.PNG)
-
-A lRosesg utelramriz watiitohn n Toe drmata?
 
 # Multiclass classification
 Remember for classification there are **generative models** and **discriminative models**:

@@ -14,7 +14,7 @@ Other methods than histogram are:
 
 *non-parametric generally more accurate since it gets the average of every data set and don't assume a pre-distribution type
 
-## Parzen density esimate (Kernel density estimation)
+## Parzen density estimate (Kernel density estimation)
 Some terms:
 - **Kernel function**: function that accepts vectors as inputs in original space and returns the dot product of the vectors in feature space.
 - **Window function**: mathematical function that is zero-valued outside of some chosen interval
