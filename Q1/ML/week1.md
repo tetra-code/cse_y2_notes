@@ -91,7 +91,16 @@ Discriminative models draw boundaries in the data space, while generative models
 ![Image](../../images/classifiers.png)
 
 
-# Bayes error
+# Bayes error and classification error
 **Bayes error** is the lowest possible prediction error that can be achieved and is the same as irreducible error
 
 ![Image](../../images/bayes_error.png)
+
+To calculate bayes error:
+1. check the optimal decision boundary
+2. check which class is making error
+3. multiply it by the class prior with error
+
+Equation for calculating classification error:
+
+![Image](../../images/classification_error.png)

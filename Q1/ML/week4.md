@@ -256,6 +256,6 @@ Train K or K-1 classifiers to discriminate between the class K and all other cla
 ![Image](../../images/one_vs_rest.png)
 
 ## multiple 2-class classifiers
-Also called **one-vs-one** approach. Train K/2 or (K-1)/2 classifiers to discriminiate between all pairs of classes. combine multiple 2-class classifiers
+Also called **one-vs-one** approach. Train (K*(K-1))/2 classifiers to discriminiate between all pairs of classes. combine multiple 2-class classifiers
 
 ![Image](../../images/one_vs_one.png)
