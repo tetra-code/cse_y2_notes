@@ -89,3 +89,9 @@ Within **supervised classification** there are 2 types of classifiers
 Discriminative models draw boundaries in the data space, while generative models try to model how data is placed throughout the space.
 
 ![Image](../../images/classifiers.png)
+
+
+# Bayes error
+**Bayes error** is the lowest possible prediction error that can be achieved and is the same as irreducible error
+
+![Image](../../images/bayes_error.png)
