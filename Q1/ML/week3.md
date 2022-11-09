@@ -101,9 +101,10 @@ To determine the right value of k is similar to choosing the right value of h fr
 
 If we have equal number of positive/negative neighbours:
 - choose an odd k (doesn't solve multi class)
-- randomly decide positive or negative
-- pick class with greater prior
-- use 1-nn classifier to decide
+- To break ties:
+    - randomly decide positive or negative
+    - pick class with greater prior
+    - use 1-nn classifier to decide
 
 To measure the distance:
 - Euclidean (numeric features)

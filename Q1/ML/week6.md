@@ -15,24 +15,21 @@ The decision tree has two cases:
 - multi-class (discrete): take sum over all classes in entrophy 
 - regression (continuous):  squared loss as loss function, average outcome as leaf value, and minimum variance as split criterion
 
-
 The split:
-if all objects in a node belong to one class we are done. 
-Otherwise find variable to split onto and the node in the tree where we can gain the most.
+- if all objects in a node belong to one class we are done. 
+- else pick the best attribute to split *(split that leads to the highest information gain).*
 
-To measure the gain we don't use regular misclassification error since may not be optimal for following splits.
+The relevant information is **purity**:  pureness of subset of examples after splitting the data. 
 
-Instead we measure the **inpurity**:
-
-![Image](../../images/measure_improvement.PNG)
-
-Above: we start with inpurity measure in original node and compare that with the inpurity in all the new nodes that were created due to the split.
-
-Chossing the function for inpurity measure I(S):
+For this we mostly use **entrophy** as purity measure I(S):
 
 ![Image](../../images/is.PNG)
 
 ![Image](../../images/impurity.PNG)
+
+Below we start with purity measure in original node and compare that with the purity in all the new nodes that were created due to the split.
+
+![Image](../../images/measure_improvement.PNG)
 
 Improvement measure example:
 

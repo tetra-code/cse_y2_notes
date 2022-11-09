@@ -81,8 +81,8 @@ Given a set of passenger data for a single passenger the inference approach give
 
 # Discriminiative classifiers
 Within **supervised classification** there are 2 types of classifiers
-- **generative classifiers**: model how data is placed throughout the space 
-- **discriminiative classifiers**:  draw boundaries in the data space
+- **generative classifiers**: estimate prior and class conditional from training data and use Bayes rule to calculate P(Y|X).
+- **discriminiative classifiers**: directly assume functional form for P(Y|X) and estimate parameters of P(Y|X) directly from training data
 
 ![Image](../../images/discrminiatve_generative.png)
 
@@ -92,9 +92,11 @@ Discriminative models draw boundaries in the data space, while generative models
 
 
 # Bayes error and classification error
-**Bayes error** is the lowest possible prediction error that can be achieved and is the same as irreducible error
+**Bayes error** is the minimum possible prediction error that can be achieved and is the same as irreducible error
 
 ![Image](../../images/bayes_error.png)
+
+It depends on the true class conditional p(x|w), thus not easily computable.
 
 To calculate bayes error:
 1. check the optimal decision boundary
