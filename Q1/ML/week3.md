@@ -103,7 +103,7 @@ If we have equal number of positive/negative neighbours:
 - choose an odd k (doesn't solve multi class)
 - To break ties:
     - randomly decide positive or negative
-    - pick class with greater prior
+    - pick class with greater prior (may be the same)
     - use 1-nn classifier to decide
 
 To measure the distance:

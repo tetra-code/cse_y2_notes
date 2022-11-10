@@ -135,10 +135,7 @@ Traditional frameworks are not well-suited for processing graphs.
 ## PageRank algorithm
 PageRank is a centrality measure based on the idea that nodes are important if multiple important nodes point to them. 
 
-For node *pi*, its Page rank is recursively defined as:
-
-![Image](../../images/pagerank.png)
-
+- *pi* is the node
 - *d* is a damping factor (usually set 0.85)
 - *M(pi)* are the nodes pointing to *pi*
 

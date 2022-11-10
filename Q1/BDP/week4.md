@@ -125,7 +125,7 @@ Order is a way of arranging items in a set so that the following properties are 
 
 ![Image](../../images/strict_partial_order.PNG)
 
-- **strict total order**: partial order in which every element of the set is comparable with every other element of the set.
+- **strict total order**: partial order in which every element of the set is comparable with every other element of the set (this forces a linear order or chain)
 
 ![Image](../../images/strict_total_order.PNG)
 
